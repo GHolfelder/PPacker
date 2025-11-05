@@ -61,8 +61,7 @@ Get-ChildItem $outputDir -Directory | ForEach-Object {
     $exe = Get-ChildItem $exePath -File | Select-Object -First 1
     if ($exe) {
         $size = [math]::Round($exe.Length / 1MB, 2)
-        $sizeText = "$size MB"
-        Write-Host "  $($_.Name): $($exe.Name) ($sizeText)" -ForegroundColor Cyan
+        Write-Host "  $($_.Name): $($exe.Name) ($size MB)" -ForegroundColor Cyan
     }
 }
 
