@@ -1,0 +1,77 @@
+{
+  "inputs": [
+    {
+      "imagePath": "assets/sprites/player/idle.png",
+      "prefix": "player_idle_"
+    },
+    {
+      "imagePath": "assets/sprites/player/walk.png",
+      "dataPath": "assets/sprites/player/walk.json",
+      "prefix": "player_walk_"
+    },
+    {
+      "imagePath": "assets/sprites/enemies.png",
+      "dataPath": "assets/sprites/enemies.json",
+      "prefix": "enemy_"
+    },
+    {
+      "imagePath": "assets/ui/buttons.png",
+      "dataPath": "assets/ui/buttons.json",
+      "prefix": "ui_"
+    }
+  ],
+  "output": {
+    "imagePath": "build/atlas.png",
+    "dataPath": "build/atlas.json",
+    "animationPath": "build/animations.json"
+  },
+  "atlas": {
+    "maxWidth": 2048,
+    "maxHeight": 2048,
+    "padding": 2,
+    "allowRotation": false,
+    "trimSprites": true,
+    "powerOfTwo": true
+  },
+  "animations": [
+    {
+      "name": "player_idle",
+      "pattern": {
+        "namePattern": "player_idle_{0:D2}",
+        "startFrame": 1,
+        "endFrame": 4
+      },
+      "frameDuration": 200,
+      "loop": true
+    },
+    {
+      "name": "player_walk",
+      "pattern": {
+        "namePattern": "player_walk_{0:D2}",
+        "startFrame": 1,
+        "endFrame": 8
+      },
+      "frameDuration": 100,
+      "loop": true
+    },
+    {
+      "name": "enemy_goblin_attack",
+      "frames": [
+        "enemy_goblin_attack_01",
+        "enemy_goblin_attack_02",
+        "enemy_goblin_attack_03"
+      ],
+      "frameDuration": 120,
+      "loop": false
+    },
+    {
+      "name": "ui_button_press",
+      "frames": [
+        "ui_button_normal",
+        "ui_button_pressed"
+      ],
+      "frameDuration": 50,
+      "loop": false
+    }
+  ]
+}

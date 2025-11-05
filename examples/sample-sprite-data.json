@@ -1,0 +1,95 @@
+{
+  "width": 256,
+  "height": 128,
+  "sprites": [
+    {
+      "name": "goblin_idle",
+      "x": 0,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "rotated": false
+    },
+    {
+      "name": "goblin_walk_01",
+      "x": 32,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "rotated": false
+    },
+    {
+      "name": "goblin_walk_02",
+      "x": 64,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "rotated": false
+    },
+    {
+      "name": "goblin_attack_01",
+      "x": 96,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "rotated": false
+    },
+    {
+      "name": "goblin_attack_02",
+      "x": 128,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "rotated": false
+    },
+    {
+      "name": "goblin_attack_03",
+      "x": 160,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "rotated": false
+    },
+    {
+      "name": "orc_idle",
+      "x": 0,
+      "y": 32,
+      "width": 48,
+      "height": 48,
+      "rotated": false,
+      "sourceWidth": 48,
+      "sourceHeight": 48,
+      "trimX": 0,
+      "trimY": 0
+    },
+    {
+      "name": "orc_walk_01",
+      "x": 48,
+      "y": 32,
+      "width": 48,
+      "height": 48,
+      "rotated": false
+    },
+    {
+      "name": "orc_walk_02",
+      "x": 96,
+      "y": 32,
+      "width": 48,
+      "height": 48,
+      "rotated": false
+    }
+  ],
+  "metadata": {
+    "version": "1.0.0",
+    "generated": "2025-11-04T10:00:00Z",
+    "sources": ["enemies-spritesheet.png"],
+    "settings": {
+      "maxWidth": 256,
+      "maxHeight": 128,
+      "padding": 0,
+      "allowRotation": false,
+      "trimSprites": false,
+      "powerOfTwo": true
+    }
+  }
+}

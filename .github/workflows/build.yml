@@ -1,0 +1,103 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  release:
+    types: [ published ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+        
+    - name: Restore dependencies
+      run: dotnet restore
+      
+    - name: Build
+      run: dotnet build --no-restore
+      
+    - name: Test
+      run: dotnet test --no-build --verbosity normal
+
+  build-standalone:
+    needs: test
+    runs-on: ${{ matrix.os }}
+    if: github.event_name == 'release'
+    
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            runtime: win-x64
+            artifact-name: ppacker-win-x64
+          - os: windows-latest
+            runtime: win-x86
+            artifact-name: ppacker-win-x86
+          - os: ubuntu-latest
+            runtime: linux-x64
+            artifact-name: ppacker-linux-x64
+          - os: macos-latest
+            runtime: osx-x64
+            artifact-name: ppacker-osx-x64
+          - os: macos-latest
+            runtime: osx-arm64
+            artifact-name: ppacker-osx-arm64
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+        
+    - name: Publish standalone
+      run: |
+        dotnet publish src/PPacker/PPacker.csproj \
+          -c Release \
+          -r ${{ matrix.runtime }} \
+          --self-contained true \
+          -o dist/${{ matrix.runtime }} \
+          -p:PublishSingleFile=true \
+          -p:IncludeNativeLibrariesForSelfExtract=true
+    
+    - name: Prepare artifacts (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        mkdir artifacts
+        copy "dist\${{ matrix.runtime }}\PPacker.exe" "artifacts\PPacker.exe"
+      shell: cmd
+      
+    - name: Prepare artifacts (Unix)
+      if: runner.os != 'Windows'
+      run: |
+        mkdir artifacts
+        cp "dist/${{ matrix.runtime }}/PPacker" "artifacts/PPacker"
+        chmod +x "artifacts/PPacker"
+    
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.artifact-name }}
+        path: artifacts/
+        
+    - name: Upload to release
+      if: github.event_name == 'release'
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: artifacts/PPacker${{ runner.os == 'Windows' && '.exe' || '' }}
+        asset_name: PPacker-${{ matrix.runtime }}${{ runner.os == 'Windows' && '.exe' || '' }}
+        asset_content_type: application/octet-stream
