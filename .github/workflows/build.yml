@@ -40,18 +40,23 @@ jobs:
           - os: windows-latest
             runtime: win-x64
             artifact-name: ppacker-win-x64
+            executable-extension: .exe
           - os: windows-latest
             runtime: win-x86
             artifact-name: ppacker-win-x86
+            executable-extension: .exe
           - os: ubuntu-latest
             runtime: linux-x64
             artifact-name: ppacker-linux-x64
+            executable-extension: ""
           - os: macos-latest
             runtime: osx-x64
             artifact-name: ppacker-osx-x64
+            executable-extension: ""
           - os: macos-latest
             runtime: osx-arm64
             artifact-name: ppacker-osx-arm64
+            executable-extension: ""
     
     steps:
     - uses: actions/checkout@v4
@@ -62,42 +67,26 @@ jobs:
         dotnet-version: 8.0.x
         
     - name: Publish standalone
-      run: |
-        dotnet publish src/PPacker/PPacker.csproj \
-          -c Release \
-          -r ${{ matrix.runtime }} \
-          --self-contained true \
-          -o dist/${{ matrix.runtime }} \
-          -p:PublishSingleFile=true \
-          -p:IncludeNativeLibrariesForSelfExtract=true
+      run: dotnet publish src/PPacker/PPacker.csproj -c Release -r ${{ matrix.runtime }} --self-contained true -o dist/${{ matrix.runtime }} -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
     
     - name: Prepare artifacts (Windows)
       if: runner.os == 'Windows'
       run: |
         mkdir artifacts
-        copy "dist\${{ matrix.runtime }}\PPacker.exe" "artifacts\PPacker.exe"
+        copy "dist\\${{ matrix.runtime }}\\PPacker.exe" "artifacts\\PPacker.exe"
       shell: cmd
       
     - name: Prepare artifacts (Unix)
       if: runner.os != 'Windows'
       run: |
-        mkdir artifacts
+        mkdir -p artifacts
         cp "dist/${{ matrix.runtime }}/PPacker" "artifacts/PPacker"
         chmod +x "artifacts/PPacker"
     
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v4
+    - name: Upload Release Asset
+      uses: softprops/action-gh-release@v1
       with:
-        name: ${{ matrix.artifact-name }}
-        path: artifacts/
-        
-    - name: Upload to release
-      if: github.event_name == 'release'
-      uses: actions/upload-release-asset@v1
+        files: artifacts/PPacker${{ matrix.executable-extension }}
+        name: PPacker-${{ matrix.runtime }}${{ matrix.executable-extension }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ github.event.release.upload_url }}
-        asset_path: artifacts/PPacker${{ runner.os == 'Windows' && '.exe' || '' }}
-        asset_name: PPacker-${{ matrix.runtime }}${{ runner.os == 'Windows' && '.exe' || '' }}
-        asset_content_type: application/octet-stream
