@@ -67,7 +67,15 @@ jobs:
         dotnet-version: 8.0.x
         
     - name: Publish standalone
-      run: dotnet publish src/PPacker/PPacker.csproj -c Release -r ${{ matrix.runtime }} --self-contained true -o dist/${{ matrix.runtime }} -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
+      shell: bash
+      run: |
+        dotnet publish src/PPacker/PPacker.csproj \
+          -c Release \
+          -r ${{ matrix.runtime }} \
+          --self-contained true \
+          -o dist/${{ matrix.runtime }} \
+          -p:PublishSingleFile=true \
+          -p:IncludeNativeLibrariesForSelfExtract=true
     
     - name: Prepare artifacts (Windows)
       if: runner.os == 'Windows'
