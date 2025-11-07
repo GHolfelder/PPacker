@@ -94,6 +94,7 @@ jobs:
         mkdir -p artifacts
         cp "dist/${{ matrix.runtime }}/PPacker" "artifacts/PPacker"
         chmod +x "artifacts/PPacker"
+        ls -la artifacts/  # Debug: list artifacts directory
     
     - name: Upload artifacts (for manual runs)
       if: github.event_name == 'workflow_dispatch'
@@ -101,6 +102,15 @@ jobs:
       with:
         name: ${{ matrix.artifact-name }}
         path: artifacts/PPacker${{ matrix.executable-extension }}
+    
+    - name: Debug file existence (for releases)
+      if: github.event_name == 'release'
+      run: |
+        echo "Checking artifacts directory:"
+        ls -la artifacts/ || echo "No artifacts directory"
+        echo "Looking for file: artifacts/PPacker${{ matrix.executable-extension }}"
+        test -f "artifacts/PPacker${{ matrix.executable-extension }}" && echo "File exists!" || echo "File does not exist!"
+      shell: bash
     
     - name: Upload Release Asset (for releases only)
       if: github.event_name == 'release'
