@@ -17,7 +17,7 @@ A powerful command-line tool for packing PNG files into texture atlases for Mono
 
 ### Standalone Executable (Recommended)
 
-Download the latest standalone executable for your platform from the [Releases page](https://github.com/PPacker/releases):
+Download the latest standalone executable for your platform from the [Releases page](https://github.com/GHolfelder/PPacker/releases):
 
 - **Windows**: `PPacker.exe` (self-contained, no .NET installation required)
 - **Linux**: `PPacker` (self-contained, no .NET installation required)
