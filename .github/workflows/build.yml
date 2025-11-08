@@ -85,15 +85,15 @@ jobs:
       if: runner.os == 'Windows'
       run: |
         mkdir artifacts
-        copy "dist\\${{ matrix.runtime }}\\PPacker.exe" "artifacts\\PPacker.exe"
+        copy "dist\\${{ matrix.runtime }}\\PPacker.exe" "artifacts\\PPacker-${{ matrix.runtime }}.exe"
       shell: cmd
       
     - name: Prepare artifacts (Unix)
       if: runner.os != 'Windows'
       run: |
         mkdir -p artifacts
-        cp "dist/${{ matrix.runtime }}/PPacker" "artifacts/PPacker"
-        chmod +x "artifacts/PPacker"
+        cp "dist/${{ matrix.runtime }}/PPacker" "artifacts/PPacker-${{ matrix.runtime }}"
+        chmod +x "artifacts/PPacker-${{ matrix.runtime }}"
         ls -la artifacts/  # Debug: list artifacts directory
     
     - name: Upload artifacts (for manual runs)
@@ -101,22 +101,21 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.artifact-name }}
-        path: artifacts/PPacker${{ matrix.executable-extension }}
+        path: artifacts/PPacker-${{ matrix.runtime }}${{ matrix.executable-extension }}
     
     - name: Debug file existence (for releases)
       if: github.event_name == 'release'
       run: |
         echo "Checking artifacts directory:"
         ls -la artifacts/ || echo "No artifacts directory"
-        echo "Looking for file: artifacts/PPacker${{ matrix.executable-extension }}"
-        test -f "artifacts/PPacker${{ matrix.executable-extension }}" && echo "File exists!" || echo "File does not exist!"
+        echo "Looking for file: artifacts/PPacker-${{ matrix.runtime }}${{ matrix.executable-extension }}"
+        test -f "artifacts/PPacker-${{ matrix.runtime }}${{ matrix.executable-extension }}" && echo "File exists!" || echo "File does not exist!"
       shell: bash
     
     - name: Upload Release Asset (for releases only)
       if: github.event_name == 'release'
       uses: softprops/action-gh-release@v1
       with:
-        files: artifacts/PPacker${{ matrix.executable-extension }}
-        name: PPacker-${{ matrix.runtime }}${{ matrix.executable-extension }}
+        files: artifacts/PPacker-${{ matrix.runtime }}${{ matrix.executable-extension }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
