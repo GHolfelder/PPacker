@@ -13,10 +13,12 @@ namespace PPacker.Core;
 public class AtlasPacker
 {
     private readonly PackerConfig _config;
+    private readonly bool _verbose;
 
-    public AtlasPacker(PackerConfig config)
+    public AtlasPacker(PackerConfig config, bool verbose = false)
     {
         _config = config;
+        _verbose = verbose;
     }
 
     /// <summary>
@@ -102,36 +104,141 @@ public class AtlasPacker
     {
         var allSprites = new List<SpriteInfo>();
 
-        foreach (var input in _config.Inputs)
+        if (_verbose)
         {
+            Console.WriteLine($"\n[VERBOSE] LoadAllSprites: Processing {_config.Inputs.Count} input(s)");
+        }
+
+        for (int i = 0; i < _config.Inputs.Count; i++)
+        {
+            var input = _config.Inputs[i];
+            
+            if (_verbose)
+            {
+                Console.WriteLine($"\n[VERBOSE] Processing Input #{i + 1}:");
+                Console.WriteLine($"[VERBOSE]   ImagePath: '{input.ImagePath}'");
+                Console.WriteLine($"[VERBOSE]   DataPath: '{input.DataPath ?? "null"}'");
+                Console.WriteLine($"[VERBOSE]   Prefix: '{input.Prefix ?? "null"}'");
+            }
+
             if (!File.Exists(input.ImagePath))
             {
                 Console.WriteLine($"Warning: Image file not found: {input.ImagePath}");
+                if (_verbose)
+                {
+                    Console.WriteLine($"[VERBOSE] Skipping input #{i + 1} - image file not found");
+                }
                 continue;
+            }
+
+            if (_verbose)
+            {
+                Console.WriteLine($"[VERBOSE] Image file exists: {input.ImagePath}");
             }
 
             if (!string.IsNullOrEmpty(input.DataPath))
             {
+                if (_verbose)
+                {
+                    Console.WriteLine($"[VERBOSE] DataPath specified, checking if file exists...");
+                }
+
                 // Load sprites from sprite sheet with data
                 if (!File.Exists(input.DataPath))
                 {
                     Console.WriteLine($"Warning: Data file not found: {input.DataPath}");
-                    continue;
-                }
+                    Console.WriteLine($"Falling back to processing {input.ImagePath} as single sprite");
+                    
+                    if (_verbose)
+                    {
+                        Console.WriteLine($"[VERBOSE] DataPath fallback: Processing as single sprite");
+                    }
+                    
+                    // Fall back to single sprite processing
+                    var spriteName = input.Prefix != null 
+                        ? $"{input.Prefix}{Path.GetFileNameWithoutExtension(input.ImagePath)}"
+                        : null;
 
-                var spriteData = await LoadSpriteDataAsync(input.DataPath);
-                var sprites = SpriteProcessor.ExtractSprites(input.ImagePath, spriteData, input.Prefix);
-                allSprites.AddRange(sprites);
+                    if (_verbose)
+                    {
+                        Console.WriteLine($"[VERBOSE] Generated sprite name: '{spriteName ?? "null"}'");
+                        Console.WriteLine($"[VERBOSE] Calling SpriteProcessor.LoadSprite...");
+                    }
+                    
+                    var sprite = SpriteProcessor.LoadSprite(input.ImagePath, spriteName, _config.Atlas.TrimSprites);
+                    allSprites.Add(sprite);
+                    
+                    if (_verbose)
+                    {
+                        Console.WriteLine($"[VERBOSE] Added sprite: '{sprite.Name}' ({sprite.Image.Width}x{sprite.Image.Height})");
+                        Console.WriteLine($"[VERBOSE] Total sprites so far: {allSprites.Count}");
+                    }
+                }
+                else
+                {
+                    if (_verbose)
+                    {
+                        Console.WriteLine($"[VERBOSE] DataPath exists, loading sprite sheet data...");
+                    }
+                    
+                    var spriteData = await LoadSpriteDataAsync(input.DataPath);
+                    
+                    if (_verbose)
+                    {
+                        Console.WriteLine($"[VERBOSE] Loaded {spriteData.Count} sprite definitions from data file");
+                        Console.WriteLine($"[VERBOSE] Calling SpriteProcessor.ExtractSprites...");
+                    }
+                    
+                    var sprites = SpriteProcessor.ExtractSprites(input.ImagePath, spriteData, input.Prefix);
+                    allSprites.AddRange(sprites);
+                    
+                    if (_verbose)
+                    {
+                        Console.WriteLine($"[VERBOSE] Extracted {sprites.Count} sprites from sheet");
+                        foreach (var s in sprites)
+                        {
+                            Console.WriteLine($"[VERBOSE]   - '{s.Name}' ({s.Image.Width}x{s.Image.Height})");
+                        }
+                        Console.WriteLine($"[VERBOSE] Total sprites so far: {allSprites.Count}");
+                    }
+                }
             }
             else
             {
+                if (_verbose)
+                {
+                    Console.WriteLine($"[VERBOSE] No DataPath specified, processing as single sprite");
+                }
+                
                 // Load single sprite
                 var spriteName = input.Prefix != null 
                     ? $"{input.Prefix}{Path.GetFileNameWithoutExtension(input.ImagePath)}"
                     : null;
+
+                if (_verbose)
+                {
+                    Console.WriteLine($"[VERBOSE] Generated sprite name: '{spriteName ?? "null"}'");
+                    Console.WriteLine($"[VERBOSE] Calling SpriteProcessor.LoadSprite...");
+                }
                 
                 var sprite = SpriteProcessor.LoadSprite(input.ImagePath, spriteName, _config.Atlas.TrimSprites);
                 allSprites.Add(sprite);
+                
+                if (_verbose)
+                {
+                    Console.WriteLine($"[VERBOSE] Added sprite: '{sprite.Name}' ({sprite.Image.Width}x{sprite.Image.Height})");
+                    Console.WriteLine($"[VERBOSE] Total sprites so far: {allSprites.Count}");
+                }
+            }
+        }
+
+        if (_verbose)
+        {
+            Console.WriteLine($"\n[VERBOSE] LoadAllSprites complete: {allSprites.Count} total sprite(s) loaded");
+            for (int i = 0; i < allSprites.Count; i++)
+            {
+                var sprite = allSprites[i];
+                Console.WriteLine($"[VERBOSE] Final Sprite #{i + 1}: '{sprite.Name}' ({sprite.Image.Width}x{sprite.Image.Height})");
             }
         }
 

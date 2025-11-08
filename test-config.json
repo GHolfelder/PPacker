@@ -1,0 +1,24 @@
+{
+    "inputs": [
+        {
+            "imagePath": "./player/walk/walk_N.png",
+            "dataPath": "./player/walk/walk_N.json",
+            "prefix": "player_"
+        }, {
+            "imagePath": "./player/walk/walk_E.png",
+            "prefix": "player_"
+        }
+    ],
+    "output": {
+        "imagePath": "../Content/images/atlas.png",
+        "dataPath": "../Content/images/atlas.json"
+    },
+    "atlas": {
+        "maxWidth": 2048,
+        "maxHeight": 2048,
+        "padding": 2,
+        "allowRotation": false,
+        "trimSprites": true,
+        "powerOfTwo": true
+    }    
+}

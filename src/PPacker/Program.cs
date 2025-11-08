@@ -80,7 +80,7 @@ class Program
         {
             if (verbose)
             {
-                Console.WriteLine($"PPacker v1.0.0");
+                Console.WriteLine($"PPacker v1.0.5");
                 Console.WriteLine($"Configuration file: {configFile.FullName}");
             }
 
@@ -130,7 +130,7 @@ class Program
             }
 
             // Pack the atlas
-            var packer = new AtlasPacker(config);
+            var packer = new AtlasPacker(config, verbose);
             var success = await packer.PackAsync();
 
             if (success)
