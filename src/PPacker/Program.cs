@@ -80,7 +80,7 @@ class Program
         {
             if (verbose)
             {
-                Console.WriteLine($"PPacker v1.0.5");
+                Console.WriteLine($"PPacker v1.0.6");
                 Console.WriteLine($"Configuration file: {configFile.FullName}");
             }
 

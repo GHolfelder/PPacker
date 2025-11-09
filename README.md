@@ -1,16 +1,19 @@
 # PPacker
 
-A powerful command-line tool for packing PNG files into texture atlases for MonoGame projects, with comprehensive sprite animation support.
+A powerful command-line tool for packing PNG files into texture atlases for MonoGame projects, with comprehensive sprite animation support and Aseprite integration.
 
 ## Features
 
 - **Texture Atlas Packing**: Efficiently pack multiple PNG files into a single texture atlas
 - **Sprite Data Merging**: Merge JSON sprite definitions and automatically update coordinates
-- **Animation Support**: Create animation definitions from sprite sequences
-- **Flexible Input**: Support for individual sprites or existing sprite sheets with metadata
+- **Aseprite Support**: Native support for Aseprite JSON exports - automatically detects and parses frame data
+- **Animation Support**: Create animation definitions from sprite sequences with pattern matching
+- **Flexible Input**: Support for individual sprites, existing sprite sheets, or Aseprite exports
 - **Smart Packing**: Bin packing algorithm with optional rotation for optimal space usage
 - **Sprite Trimming**: Automatically remove transparent borders to save space
 - **Power-of-2 Support**: Generate power-of-2 atlas dimensions for optimal GPU performance
+- **Enhanced Debugging**: Comprehensive verbose logging to troubleshoot packing issues
+- **Graceful Fallbacks**: Missing data files automatically fall back to single sprite processing
 - **MonoGame Ready**: Output format compatible with MonoGame content pipeline
 
 ## Installation
@@ -174,6 +177,66 @@ The data file should contain sprite definitions:
 | `trimSprites` | bool | true | Remove transparent borders |
 | `powerOfTwo` | bool | true | Force power-of-2 dimensions |
 
+### Aseprite Integration
+
+PPacker automatically detects and supports Aseprite JSON exports. Simply export your Aseprite animation as a sprite sheet with JSON data, and PPacker will handle the rest.
+
+#### Aseprite Export Format
+
+When you export from Aseprite with JSON data, you get this format:
+```json
+{
+  "frames": [
+    {
+      "filename": "walk_E_0.aseprite",
+      "frame": { "x": 0, "y": 0, "w": 64, "h": 64 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+      "sourceSize": { "w": 64, "h": 64 },
+      "duration": 130
+    },
+    {
+      "filename": "walk_E_1.aseprite", 
+      "frame": { "x": 64, "y": 0, "w": 64, "h": 64 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 64, "h": 64 },
+      "sourceSize": { "w": 64, "h": 64 },
+      "duration": 130
+    }
+  ]
+}
+```
+
+#### Using Aseprite Data
+
+```json
+{
+  "inputs": [
+    {
+      "imagePath": "animations/walk_east.png",
+      "dataPath": "animations/walk_east.json",
+      "prefix": "player_"
+    }
+  ]
+}
+```
+
+PPacker will:
+1. **Auto-detect** the Aseprite JSON format
+2. **Extract frames** from the sprite sheet using the frame coordinates
+3. **Generate sprite names** by removing the `.aseprite` extension (e.g., `walk_E_0`)
+4. **Apply prefix** if specified (e.g., `player_walk_E_0`)
+5. **Handle trimming** information automatically
+
+#### Format Priority
+
+PPacker tries to parse JSON data in this order:
+1. **Aseprite format** (with `frames` array) - NEW!
+2. **AtlasData format** (existing PPacker format)
+3. **Direct SpriteData array** (simple array format)
+
 ### Animation Configuration
 
 Define animations using frame patterns or explicit frame lists:
@@ -195,6 +258,30 @@ Define animations using frame patterns or explicit frame lists:
   ]
 }
 ```
+
+#### Aseprite Animation Example
+Perfect for Aseprite exports where frames are numbered sequentially:
+```json
+{
+  "animations": [
+    {
+      "name": "walk_east",
+      "pattern": {
+        "namePattern": "player_walk_E_{0}",
+        "startFrame": 0,
+        "endFrame": 2
+      },
+      "frameDuration": 130,
+      "loop": true
+    }
+  ]
+}
+```
+
+**Pattern Format Guide:**
+- `{0}` → Plain numbers: `1`, `2`, `3`, `10`
+- `{0:D2}` → Zero-padded 2 digits: `01`, `02`, `03`, `10`
+- `{0:D3}` → Zero-padded 3 digits: `001`, `002`, `003`, `010`
 
 #### Explicit Frame List
 ```json
@@ -222,15 +309,53 @@ ppacker --config config.json
 ppacker --config config.json --output-dir ./build
 ```
 
-### Verbose Output
+### Verbose Output (Enhanced Debugging)
 ```bash
 ppacker --config config.json --verbose
 ```
+
+The verbose mode provides comprehensive debugging information including:
+- **File Processing**: Shows each input file being processed
+- **Format Detection**: Displays which JSON format is detected (Aseprite, AtlasData, etc.)
+- **Sprite Loading**: Details about each sprite loaded and its dimensions
+- **Fallback Logic**: When data files are missing, shows fallback to single sprite processing
+- **Animation Generation**: Frame name generation and validation
+- **Packing Details**: Bin packing progress and final atlas dimensions
+
+Perfect for troubleshooting when sprites don't appear in the final atlas!
 
 ### Generate Examples
 ```bash
 ppacker example --output ./examples
 ```
+
+## Enhanced Features (v1.0.6)
+
+### Intelligent Data File Handling
+PPacker now gracefully handles missing or invalid data files:
+- **Automatic Fallback**: If a `dataPath` is specified but the file doesn't exist, PPacker automatically falls back to processing the image as a single sprite
+- **Multiple Format Support**: Supports Aseprite JSON, PPacker AtlasData, and direct SpriteData arrays
+- **Clear Warnings**: Provides helpful warning messages when files are missing or invalid
+
+### Comprehensive Error Debugging
+The new verbose logging system helps you identify exactly where issues occur:
+```bash
+# Example verbose output
+[VERBOSE] Processing Input #1:
+[VERBOSE]   ImagePath: './sprites/player.png'
+[VERBOSE]   DataPath: './sprites/player.json'
+[VERBOSE]   Prefix: 'player_'
+[VERBOSE] Image file exists: ./sprites/player.png
+[VERBOSE] DataPath exists, loading sprite sheet data...
+[VERBOSE] Parsed as Aseprite format with 4 frames
+[VERBOSE] Converted Aseprite frame: 'walk_0' at (0,0) 64x64
+[VERBOSE] Total sprites so far: 4
+```
+
+### Cross-Platform Compatibility
+- Standalone executables require no .NET installation
+- Consistent behavior across Windows, Linux, and macOS
+- Automated builds for all platforms via GitHub Actions
 
 ## Output Files
 
@@ -257,8 +382,8 @@ A PNG file containing all packed sprites.
     }
   ],
   "metadata": {
-    "version": "1.0.0",
-    "generated": "2025-11-04T10:00:00Z",
+    "version": "1.0.6",
+    "generated": "2025-11-08T10:00:00Z",
     "sources": ["sprites/player.png"],
     "settings": { /* atlas configuration */ }
   }
@@ -422,6 +547,56 @@ dotnet pack -c Release
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## Troubleshooting
+
+### Common Issues
+
+#### "Image file not found"
+- Verify the `imagePath` is relative to the config file location
+- Check file permissions and ensure the file exists
+- Use `--verbose` flag to see the exact path being checked
+
+#### "Animation frame not found in atlas"
+- Frame names are **case-sensitive** - ensure exact matches
+- Use `--verbose` to see generated frame names vs available sprites
+- Check that your `namePattern` matches your actual sprite names
+
+#### "No sprites found to pack"
+- Verify all image files exist at the specified paths
+- Check that data files (if specified) are valid JSON
+- Use `--verbose` to trace which inputs are being processed
+
+#### Missing sprites in final atlas
+- Use `--verbose` to see detailed processing logs
+- Check if data files are being parsed correctly
+- Verify sprite names don't conflict (duplicates are skipped)
+
+### Data File Formats
+
+PPacker supports these JSON formats (auto-detected):
+
+1. **Aseprite Format** (recommended for Aseprite users):
+   ```json
+   { "frames": [ { "filename": "sprite.aseprite", "frame": {...} } ] }
+   ```
+
+2. **PPacker AtlasData Format**:
+   ```json
+   { "width": 512, "sprites": [ { "name": "sprite", "x": 0, "y": 0, ... } ] }
+   ```
+
+3. **Direct SpriteData Array**:
+   ```json
+   [ { "name": "sprite", "x": 0, "y": 0, "width": 32, "height": 32 } ]
+   ```
+
+### Getting Help
+
+- Use `ppacker --help` for command reference
+- Use `ppacker --verbose` for detailed processing information
+- Check the [Issues page](https://github.com/GHolfelder/PPacker/issues) for known problems
+- Create example configurations with `ppacker example`
 
 ## Acknowledgments
 
