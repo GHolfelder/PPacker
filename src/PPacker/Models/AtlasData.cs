@@ -199,3 +199,93 @@ public class AnimationCollection
     [JsonPropertyName("atlasFile")]
     public string AtlasFile { get; set; } = string.Empty;
 }
+
+/// <summary>
+/// Aseprite JSON format models for importing sprite sheets
+/// </summary>
+public class AsepriteData
+{
+    /// <summary>
+    /// Array of frame definitions
+    /// </summary>
+    [JsonPropertyName("frames")]
+    public List<AsepriteFrame> Frames { get; set; } = new();
+}
+
+/// <summary>
+/// Individual frame definition from Aseprite
+/// </summary>
+public class AsepriteFrame
+{
+    /// <summary>
+    /// Filename/identifier for this frame
+    /// </summary>
+    [JsonPropertyName("filename")]
+    public string Filename { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Frame boundaries in the sprite sheet
+    /// </summary>
+    [JsonPropertyName("frame")]
+    public AsepriteRect Frame { get; set; } = new();
+
+    /// <summary>
+    /// Whether the frame is rotated
+    /// </summary>
+    [JsonPropertyName("rotated")]
+    public bool Rotated { get; set; }
+
+    /// <summary>
+    /// Whether the frame was trimmed
+    /// </summary>
+    [JsonPropertyName("trimmed")]
+    public bool Trimmed { get; set; }
+
+    /// <summary>
+    /// Sprite source size information
+    /// </summary>
+    [JsonPropertyName("spriteSourceSize")]
+    public AsepriteRect SpriteSourceSize { get; set; } = new();
+
+    /// <summary>
+    /// Original source size
+    /// </summary>
+    [JsonPropertyName("sourceSize")]
+    public AsepriteSize SourceSize { get; set; } = new();
+
+    /// <summary>
+    /// Frame duration in milliseconds (for animations)
+    /// </summary>
+    [JsonPropertyName("duration")]
+    public int Duration { get; set; }
+}
+
+/// <summary>
+/// Rectangle definition for Aseprite frames
+/// </summary>
+public class AsepriteRect
+{
+    [JsonPropertyName("x")]
+    public int X { get; set; }
+
+    [JsonPropertyName("y")]
+    public int Y { get; set; }
+
+    [JsonPropertyName("w")]
+    public int W { get; set; }
+
+    [JsonPropertyName("h")]
+    public int H { get; set; }
+}
+
+/// <summary>
+/// Size definition for Aseprite
+/// </summary>
+public class AsepriteSize
+{
+    [JsonPropertyName("w")]
+    public int W { get; set; }
+
+    [JsonPropertyName("h")]
+    public int H { get; set; }
+}

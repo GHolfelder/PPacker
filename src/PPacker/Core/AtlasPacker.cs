@@ -249,7 +249,67 @@ public class AtlasPacker
     {
         var jsonContent = await File.ReadAllTextAsync(dataPath);
         
-        // Try to parse as AtlasData first, then as simple SpriteData array
+        if (_verbose)
+        {
+            Console.WriteLine($"[VERBOSE] Attempting to parse sprite data from: {dataPath}");
+        }
+        
+        // Try to parse as Aseprite format first
+        try
+        {
+            var asepriteData = JsonSerializer.Deserialize<AsepriteData>(jsonContent, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+            
+            if (asepriteData?.Frames != null && asepriteData.Frames.Count > 0)
+            {
+                if (_verbose)
+                {
+                    Console.WriteLine($"[VERBOSE] Parsed as Aseprite format with {asepriteData.Frames.Count} frames");
+                }
+                
+                // Convert Aseprite frames to SpriteData
+                var sprites = new List<SpriteData>();
+                foreach (var frame in asepriteData.Frames)
+                {
+                    // Remove file extension from filename to get sprite name
+                    var spriteName = Path.GetFileNameWithoutExtension(frame.Filename);
+                    
+                    var spriteData = new SpriteData
+                    {
+                        Name = spriteName,
+                        X = frame.Frame.X,
+                        Y = frame.Frame.Y,
+                        Width = frame.Frame.W,
+                        Height = frame.Frame.H,
+                        Rotated = frame.Rotated,
+                        SourceWidth = frame.Trimmed ? frame.SourceSize.W : null,
+                        SourceHeight = frame.Trimmed ? frame.SourceSize.H : null,
+                        TrimX = frame.Trimmed ? frame.SpriteSourceSize.X : null,
+                        TrimY = frame.Trimmed ? frame.SpriteSourceSize.Y : null
+                    };
+                    
+                    sprites.Add(spriteData);
+                    
+                    if (_verbose)
+                    {
+                        Console.WriteLine($"[VERBOSE] Converted Aseprite frame: '{spriteName}' at ({frame.Frame.X},{frame.Frame.Y}) {frame.Frame.W}x{frame.Frame.H}");
+                    }
+                }
+                
+                return sprites;
+            }
+        }
+        catch (Exception ex)
+        {
+            if (_verbose)
+            {
+                Console.WriteLine($"[VERBOSE] Not Aseprite format: {ex.Message}");
+            }
+        }
+        
+        // Try to parse as AtlasData format
         try
         {
             var atlasData = JsonSerializer.Deserialize<AtlasData>(jsonContent, new JsonSerializerOptions
@@ -259,14 +319,22 @@ public class AtlasPacker
             
             if (atlasData?.Sprites != null)
             {
+                if (_verbose)
+                {
+                    Console.WriteLine($"[VERBOSE] Parsed as AtlasData format with {atlasData.Sprites.Count} sprites");
+                }
                 return atlasData.Sprites;
             }
         }
-        catch
+        catch (Exception ex)
         {
-            // Try as direct sprite array
+            if (_verbose)
+            {
+                Console.WriteLine($"[VERBOSE] Not AtlasData format: {ex.Message}");
+            }
         }
 
+        // Try as direct sprite array
         try
         {
             var spriteArray = JsonSerializer.Deserialize<List<SpriteData>>(jsonContent, new JsonSerializerOptions
@@ -274,13 +342,29 @@ public class AtlasPacker
                 PropertyNameCaseInsensitive = true
             });
             
-            return spriteArray ?? new List<SpriteData>();
+            if (spriteArray != null)
+            {
+                if (_verbose)
+                {
+                    Console.WriteLine($"[VERBOSE] Parsed as direct SpriteData array with {spriteArray.Count} sprites");
+                }
+                return spriteArray;
+            }
         }
-        catch
+        catch (Exception ex)
         {
-            Console.WriteLine($"Warning: Could not parse sprite data from {dataPath}");
-            return new List<SpriteData>();
+            if (_verbose)
+            {
+                Console.WriteLine($"[VERBOSE] Not direct sprite array format: {ex.Message}");
+            }
         }
+
+        Console.WriteLine($"Warning: Could not parse sprite data from {dataPath}");
+        if (_verbose)
+        {
+            Console.WriteLine($"[VERBOSE] Failed to parse as any known format (Aseprite, AtlasData, or SpriteData array)");
+        }
+        return new List<SpriteData>();
     }
 
     private AtlasData CreateAtlasData(PackingResult packingResult, int atlasWidth, int atlasHeight, List<SpriteInfo> sprites)

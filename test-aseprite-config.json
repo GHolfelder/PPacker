@@ -1,0 +1,21 @@
+{
+    "inputs": [
+        {
+            "imagePath": "./player/walk/walk_E.png",
+            "dataPath": "./test-aseprite.json",
+            "prefix": "player_"
+        }
+    ],
+    "output": {
+        "imagePath": "./test-output/atlas.png",
+        "dataPath": "./test-output/atlas.json"
+    },
+    "atlas": {
+        "maxWidth": 2048,
+        "maxHeight": 2048,
+        "padding": 2,
+        "allowRotation": false,
+        "trimSprites": true,
+        "powerOfTwo": true
+    }    
+}
