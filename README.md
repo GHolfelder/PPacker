@@ -329,7 +329,7 @@ Perfect for troubleshooting when sprites don't appear in the final atlas!
 ppacker example --output ./examples
 ```
 
-## Enhanced Features (v1.0.6)
+## Enhanced Features (v1.0.5)
 
 ### Intelligent Data File Handling
 PPacker now gracefully handles missing or invalid data files:
@@ -382,7 +382,7 @@ A PNG file containing all packed sprites.
     }
   ],
   "metadata": {
-    "version": "1.0.6",
+    "version": "1.0.5",
     "generated": "2025-11-08T10:00:00Z",
     "sources": ["sprites/player.png"],
     "settings": { /* atlas configuration */ }
