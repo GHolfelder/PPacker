@@ -14,6 +14,8 @@ public class AtlasPacker
 {
     private readonly PackerConfig _config;
     private readonly bool _verbose;
+    // Map of sprite name -> per-frame duration (ms) captured from input data (e.g., Aseprite)
+    private readonly Dictionary<string, int> _frameDurations = new(StringComparer.Ordinal);
 
     public AtlasPacker(PackerConfig config, bool verbose = false)
     {
@@ -190,6 +192,26 @@ public class AtlasPacker
                     }
                     
                     var sprites = SpriteProcessor.ExtractSprites(input.ImagePath, spriteData, input.Prefix);
+                    // If a prefix was applied, mirror any captured per-frame durations onto the prefixed names
+                    if (!string.IsNullOrEmpty(input.Prefix) && _frameDurations.Count > 0)
+                    {
+                        foreach (var s in sprites)
+                        {
+                            if (s.Name.StartsWith(input.Prefix, StringComparison.Ordinal))
+                            {
+                                var baseName = s.Name.Substring(input.Prefix.Length);
+                                if (_frameDurations.TryGetValue(baseName, out var baseDur))
+                                {
+                                    // Store duration for the prefixed name used in animations/output
+                                    _frameDurations[s.Name] = baseDur;
+                                    if (_verbose)
+                                    {
+                                        Console.WriteLine($"[VERBOSE]   Mapped duration {baseDur}ms from '{baseName}' to prefixed '{s.Name}'");
+                                    }
+                                }
+                            }
+                        }
+                    }
                     allSprites.AddRange(sprites);
                     
                     if (_verbose)
@@ -291,10 +313,16 @@ public class AtlasPacker
                     };
                     
                     sprites.Add(spriteData);
-                    
+                    // Capture per-frame duration for later animation generation (ignore 0 or negative values)
+                    if (frame.Duration > 0)
+                    {
+                        _frameDurations[spriteName] = frame.Duration;
+                    }
+
                     if (_verbose)
                     {
-                        Console.WriteLine($"[VERBOSE] Converted Aseprite frame: '{spriteName}' at ({frame.Frame.X},{frame.Frame.Y}) {frame.Frame.W}x{frame.Frame.H}");
+                        var durText = frame.Duration > 0 ? $"duration={frame.Duration}ms" : "duration=(none)";
+                        Console.WriteLine($"[VERBOSE] Converted Aseprite frame: '{spriteName}' at ({frame.Frame.X},{frame.Frame.Y}) {frame.Frame.W}x{frame.Frame.H} {durText}");
                     }
                 }
                 
@@ -437,11 +465,23 @@ public class AtlasPacker
                 // Verify the sprite exists in the atlas
                 if (atlasData.Sprites.Any(s => s.Name == frameName))
                 {
+                    int? perFrameDuration = null;
+                    if (_frameDurations.TryGetValue(frameName, out var dur))
+                    {
+                        perFrameDuration = dur;
+                    }
+
                     animation.Frames.Add(new AnimationFrame
                     {
                         Sprite = frameName,
-                        Duration = null // Use default duration
+                        Duration = perFrameDuration // Use captured duration if available, else default
                     });
+
+                    if (_verbose)
+                    {
+                        var applied = perFrameDuration.HasValue ? $"{perFrameDuration.Value}ms" : $"default={animation.DefaultDuration}ms";
+                        Console.WriteLine($"[VERBOSE]   Added frame '{frameName}' with duration {applied}");
+                    }
                 }
                 else
                 {

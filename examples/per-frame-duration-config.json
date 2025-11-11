@@ -1,0 +1,34 @@
+{
+  "inputs": [
+    {
+      "imagePath": "examples/aseprite/walk_east.png",
+      "dataPath": "examples/aseprite/walk_east.json",
+      "prefix": "player_"
+    }
+  ],
+  "output": {
+    "imagePath": "examples/output/atlas.png",
+    "dataPath": "examples/output/atlas.json",
+    "animationPath": "examples/output/animations.json"
+  },
+  "atlas": {
+    "maxWidth": 512,
+    "maxHeight": 512,
+    "padding": 2,
+    "allowRotation": false,
+    "trimSprites": true,
+    "powerOfTwo": true
+  },
+  "animations": [
+    {
+      "name": "walk_east",
+      "pattern": {
+        "namePattern": "player_walk_E_{0}",
+        "startFrame": 0,
+        "endFrame": 3
+      },
+      "frameDuration": 100,
+      "loop": true
+    }
+  ]
+}

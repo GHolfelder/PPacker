@@ -1,4 +1,5 @@
 using System.CommandLine;
+using System.Reflection;
 using System.Text.Json;
 using PPacker.Core;
 using PPacker.Models;
@@ -12,6 +13,12 @@ class Program
 {
     static async Task<int> Main(string[] args)
     {
+        // Always print version banner on startup
+        var version = typeof(Program).Assembly
+            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
+            .InformationalVersion ?? "unknown";
+        Console.WriteLine($"PPacker v{version}");
+
         var rootCommand = new RootCommand("PPacker - MonoGame Texture Atlas Packer")
         {
             Description = "Pack PNG files into texture atlases for MonoGame projects with sprite animation support."
@@ -80,7 +87,6 @@ class Program
         {
             if (verbose)
             {
-                Console.WriteLine($"PPacker v1.0.5");
                 Console.WriteLine($"Configuration file: {configFile.FullName}");
             }
 

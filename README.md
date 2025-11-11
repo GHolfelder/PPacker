@@ -181,6 +181,8 @@ The data file should contain sprite definitions:
 
 PPacker automatically detects and supports Aseprite JSON exports. Simply export your Aseprite animation as a sprite sheet with JSON data, and PPacker will handle the rest.
 
+Starting with v1.0.6 per-frame Aseprite `duration` values are preserved in the generated `animations.json`. If an animation references sprites that came from an Aseprite sheet, each frame will use its original exported duration. Frames without a captured duration fall back to the animation's `defaultDuration`.
+
 #### Aseprite Export Format
 
 When you export from Aseprite with JSON data, you get this format:
@@ -229,6 +231,7 @@ PPacker will:
 3. **Generate sprite names** by removing the `.aseprite` extension (e.g., `walk_E_0`)
 4. **Apply prefix** if specified (e.g., `player_walk_E_0`)
 5. **Handle trimming** information automatically
+6. **Store per-frame duration** from the `duration` property for use in animation output
 
 #### Format Priority
 
@@ -329,7 +332,7 @@ Perfect for troubleshooting when sprites don't appear in the final atlas!
 ppacker example --output ./examples
 ```
 
-## Enhanced Features (v1.0.5)
+## Enhanced Features (v1.0.6)
 
 ### Intelligent Data File Handling
 PPacker now gracefully handles missing or invalid data files:
@@ -382,7 +385,7 @@ A PNG file containing all packed sprites.
     }
   ],
   "metadata": {
-    "version": "1.0.5",
+  "version": "1.0.6",
     "generated": "2025-11-08T10:00:00Z",
     "sources": ["sprites/player.png"],
     "settings": { /* atlas configuration */ }
@@ -398,8 +401,8 @@ A PNG file containing all packed sprites.
     {
       "name": "player_walk",
       "frames": [
-        { "sprite": "player_walk_01", "duration": null },
-        { "sprite": "player_walk_02", "duration": null }
+        { "sprite": "player_walk_01", "duration": 130 },
+        { "sprite": "player_walk_02", "duration": 130 }
       ],
       "defaultDuration": 100,
       "loop": true,
@@ -408,6 +411,10 @@ A PNG file containing all packed sprites.
   ]
 }
 ```
+
+Notes:
+- `duration` per frame appears when sourced from Aseprite JSON. If absent it will be `null` and runtime code should use `defaultDuration`.
+- `totalDuration` is the sum of explicit frame durations (or default where null).
 
 ## Integration with MonoGame
 
