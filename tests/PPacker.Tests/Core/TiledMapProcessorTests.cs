@@ -251,7 +251,7 @@ namespace PPacker.Tests.Core
 
             var imageToSpriteMap = new Dictionary<string, string>
             {
-                { "test_tiles.png", "sprite_test_tiles" }
+                { "test_tiles", "sprite_test_tiles" }
             };
 
             // Act
