@@ -465,6 +465,36 @@ Perfect for troubleshooting when sprites don't appear in the final atlas!
 ppacker example --output ./examples
 ```
 
+## Enhanced Features (v1.0.7)
+
+### Comprehensive Tiled Map Support
+PPacker now provides full integration with Tiled map files (TMX/TSX), enabling seamless tile-based game development workflows:
+
+- **TMX/TSX Parsing**: Complete support for Tiled map and tileset files with external tileset loading
+- **Multi-Layer Support**: Handle tile layers, object layers, and image layers with all properties preserved  
+- **Data Format Support**: CSV and Base64 encoding with GZIP/ZLIB compression for layer data
+- **Atlas Integration**: Automatically pack tileset images and generate sprite mappings for MonoGame
+- **Object Support**: Full support for all object types (rectangles, polygons, polylines, text objects)
+- **Animation Support**: Tile animations converted to MonoGame-compatible format
+- **Property Preservation**: All custom properties from maps, layers, tilesets, and objects maintained
+- **MonoGame Output**: Generate JSON map data optimized for MonoGame tile rendering libraries
+
+```json
+{
+  "inputs": [
+    {
+      "tmxPath": "maps/level1.tmx",
+      "prefix": "level1_"
+    }
+  ],
+  "output": {
+    "imagePath": "output/atlas.png",
+    "dataPath": "output/atlas.json",
+    "mapPath": "output/maps.json"
+  }
+}
+```
+
 ## Enhanced Features (v1.0.6)
 
 ### Intelligent Data File Handling
@@ -518,7 +548,7 @@ A PNG file containing all packed sprites.
     }
   ],
   "metadata": {
-  "version": "1.0.6",
+  "version": "1.0.7",
     "generated": "2025-11-08T10:00:00Z",
     "sources": ["sprites/player.png"],
     "settings": { /* atlas configuration */ }
