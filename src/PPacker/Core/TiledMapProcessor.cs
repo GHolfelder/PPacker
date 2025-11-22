@@ -108,7 +108,16 @@ public static class TiledMapProcessor
     /// </summary>
     public static List<string> ExtractImagePaths(TiledMap map, string mapDirectory, bool verbose = false)
     {
+        return ExtractImagePathsWithTilesetInfo(map, mapDirectory, verbose).imagePaths;
+    }
+
+    /// <summary>
+    /// Extract all image paths from a map and its tilesets with tileset source information
+    /// </summary>
+    public static (List<string> imagePaths, Dictionary<string, string> tilesetSources) ExtractImagePathsWithTilesetInfo(TiledMap map, string mapDirectory, bool verbose = false)
+    {
         var imagePaths = new List<string>();
+        var tilesetSources = new Dictionary<string, string>(); // tileset name -> TSX path
 
         if (verbose)
         {
@@ -118,9 +127,27 @@ public static class TiledMapProcessor
         // Extract tileset images
         foreach (var tileset in map.Tilesets)
         {
+            // Determine the base directory for this tileset's images
+            string baseDirectory;
+            if (!string.IsNullOrEmpty(tileset.Source))
+            {
+                // External tileset - images are relative to the TSX file location
+                var tsxPath = Path.Combine(mapDirectory, tileset.Source);
+                baseDirectory = Path.GetDirectoryName(tsxPath) ?? mapDirectory;
+                if (!string.IsNullOrEmpty(tileset.Name))
+                {
+                    tilesetSources[tileset.Name] = tsxPath;
+                }
+            }
+            else
+            {
+                // Inline tileset - images are relative to the TMX file location
+                baseDirectory = mapDirectory;
+            }
+
             if (tileset.Image != null && !string.IsNullOrEmpty(tileset.Image.Source))
             {
-                var imagePath = Path.Combine(mapDirectory, tileset.Image.Source);
+                var imagePath = Path.Combine(baseDirectory, tileset.Image.Source);
                 imagePaths.Add(imagePath);
                 
                 if (verbose)
@@ -134,7 +161,7 @@ public static class TiledMapProcessor
             {
                 if (tile.Image != null && !string.IsNullOrEmpty(tile.Image.Source))
                 {
-                    var imagePath = Path.Combine(mapDirectory, tile.Image.Source);
+                    var imagePath = Path.Combine(baseDirectory, tile.Image.Source);
                     imagePaths.Add(imagePath);
                     
                     if (verbose)
@@ -145,7 +172,7 @@ public static class TiledMapProcessor
             }
         }
 
-        // Extract image layer images
+        // Extract image layer images (always relative to map directory)
         foreach (var imageLayer in map.ImageLayers)
         {
             if (imageLayer.Image != null && !string.IsNullOrEmpty(imageLayer.Image.Source))
@@ -160,7 +187,7 @@ public static class TiledMapProcessor
             }
         }
 
-        return imagePaths.Distinct().ToList();
+        return (imagePaths.Distinct().ToList(), tilesetSources);
     }
 
     /// <summary>

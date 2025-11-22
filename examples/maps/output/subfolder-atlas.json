@@ -3,7 +3,7 @@
   "height": 256,
   "sprites": [
     {
-      "name": "desert_tmw_desert_spacing",
+      "name": "subfolder_subfolder_tiles",
       "x": 2,
       "y": 2,
       "width": 265,
@@ -17,9 +17,9 @@
   ],
   "metadata": {
     "version": "1.0.0",
-    "generated": "2025-11-22T22:41:42.8352116Z",
+    "generated": "2025-11-22T22:40:15.9889552Z",
     "sources": [
-      "sample-map.tmx"
+      "subfolder-test.tmx"
     ],
     "settings": {
       "maxWidth": 512,

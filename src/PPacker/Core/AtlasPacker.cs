@@ -126,9 +126,20 @@ public class AtlasPacker
             if (_verbose)
             {
                 Console.WriteLine($"\n[VERBOSE] Processing Input #{i + 1}:");
-                Console.WriteLine($"[VERBOSE]   ImagePath: '{input.ImagePath}'");
+                Console.WriteLine($"[VERBOSE]   ImagePath: '{input.ImagePath ?? ""}'");
                 Console.WriteLine($"[VERBOSE]   DataPath: '{input.DataPath ?? "null"}'");
+                Console.WriteLine($"[VERBOSE]   TmxPath: '{input.TmxPath ?? "null"}'");
                 Console.WriteLine($"[VERBOSE]   Prefix: '{input.Prefix ?? "null"}'");
+            }
+
+            // Skip regular image processing for TMX inputs - they are handled separately
+            if (!string.IsNullOrEmpty(input.TmxPath))
+            {
+                if (_verbose)
+                {
+                    Console.WriteLine($"[VERBOSE] TMX input detected, skipping regular image processing");
+                }
+                continue;
             }
 
             if (!File.Exists(input.ImagePath))

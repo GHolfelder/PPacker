@@ -1,0 +1,21 @@
+{
+  "inputs": [
+    {
+      "tmxPath": "subfolder-test.tmx",
+      "prefix": "subfolder_"
+    }
+  ],
+  "output": {
+    "imagePath": "output/subfolder-atlas.png",
+    "dataPath": "output/subfolder-atlas.json",
+    "mapPath": "output/subfolder-map.json"
+  },
+  "atlas": {
+    "maxWidth": 512,
+    "maxHeight": 512,
+    "padding": 2,
+    "allowRotation": false,
+    "trimSprites": true,
+    "powerOfTwo": true
+  }
+}
