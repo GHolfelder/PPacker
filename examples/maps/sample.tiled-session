@@ -1,0 +1,38 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "sample-set.tsx",
+    "expandedProjectPaths": [
+        "."
+    ],
+    "fileStates": {
+        "sample-map.tmx": {
+            "scale": 1.0192708333333333,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 674.9923352069495,
+                "y": 435.60551865099643
+            }
+        },
+        "sample-set.tsx": {
+            "scaleInDock": 1.5,
+            "scaleInEditor": 4
+        }
+    },
+    "last.imagePath": "C:/MonoGame/MonoGameLibrary/samples",
+    "map.lastUsedFormat": "tmx",
+    "openFiles": [
+        "sample-map.tmx",
+        "sample-set.tsx"
+    ],
+    "project": "sample.tiled-project",
+    "recentFiles": [
+        "sample-map.tmx",
+        "sample-set.tsx"
+    ],
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.margin": 1,
+    "tileset.spacing": 1
+}

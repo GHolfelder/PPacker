@@ -7,8 +7,9 @@ A powerful command-line tool for packing PNG files into texture atlases for Mono
 - **Texture Atlas Packing**: Efficiently pack multiple PNG files into a single texture atlas
 - **Sprite Data Merging**: Merge JSON sprite definitions and automatically update coordinates
 - **Aseprite Support**: Native support for Aseprite JSON exports - automatically detects and parses frame data
+- **Tiled Map Support**: Process Tiled TMX map files and TSX tilesets with comprehensive layer and object support
 - **Animation Support**: Create animation definitions from sprite sequences with pattern matching
-- **Flexible Input**: Support for individual sprites, existing sprite sheets, or Aseprite exports
+- **Flexible Input**: Support for individual sprites, existing sprite sheets, Aseprite exports, or Tiled maps
 - **Smart Packing**: Bin packing algorithm with optional rotation for optimal space usage
 - **Sprite Trimming**: Automatically remove transparent borders to save space
 - **Power-of-2 Support**: Generate power-of-2 atlas dimensions for optimal GPU performance
@@ -239,6 +240,138 @@ PPacker tries to parse JSON data in this order:
 1. **Aseprite format** (with `frames` array) - NEW!
 2. **AtlasData format** (existing PPacker format)
 3. **Direct SpriteData array** (simple array format)
+
+### Tiled Map Integration
+
+PPacker now supports Tiled map files (TMX) and tilesets (TSX), allowing you to pack tile graphics alongside sprites and generate MonoGame-compatible map data.
+
+#### Tiled Input Configuration
+```json
+{
+  "inputs": [
+    {
+      "tmxPath": "maps/level1.tmx",
+      "prefix": "level1_"
+    }
+  ],
+  "output": {
+    "imagePath": "output/atlas.png",
+    "dataPath": "output/atlas.json",
+    "mapPath": "output/maps.json"
+  }
+}
+```
+
+#### Supported Features
+
+PPacker supports comprehensive Tiled map features:
+
+- **External Tilesets**: Automatically loads referenced TSX files
+- **Multiple Layers**: Tile layers, object layers, and image layers
+- **Layer Data Formats**: CSV, Base64, with GZIP/ZLIB compression support  
+- **Custom Properties**: Preserves map, layer, tileset, and object properties
+- **Animations**: Tile animations are converted to MonoGame format
+- **Objects**: Points, rectangles, ellipses, polygons, polylines, and text objects
+- **Image Collections**: Individual tile images in addition to tileset images
+
+#### Map Data Output
+
+When processing TMX files, PPacker generates a `maps.json` file containing:
+
+```json
+{
+  "name": "level1",
+  "width": 32,
+  "height": 24,
+  "tileWidth": 32,
+  "tileHeight": 32,
+  "orientation": "orthogonal",
+  "atlasFile": "atlas.png",
+  "tilesets": [
+    {
+      "name": "terrain",
+      "firstGid": 1,
+      "tileWidth": 32,
+      "tileHeight": 32,
+      "atlasSprite": "level1_terrain",
+      "tiles": [
+        {
+          "id": 0,
+          "type": "grass",
+          "properties": { "walkable": true }
+        }
+      ]
+    }
+  ],
+  "tileLayers": [
+    {
+      "name": "Ground",
+      "width": 32,
+      "height": 24,
+      "tiles": [1, 2, 3, ...],
+      "properties": { "layer_type": "background" }
+    }
+  ],
+  "objectLayers": [
+    {
+      "name": "Entities",
+      "objects": [
+        {
+          "name": "player_spawn",
+          "type": "PlayerSpawn",
+          "x": 64,
+          "y": 96,
+          "properties": { "team": "blue" }
+        }
+      ]
+    }
+  ],
+  "imageLayers": [
+    {
+      "name": "Background",
+      "atlasSprite": "level1_bg_mountains",
+      "properties": { "parallax": 0.5 }
+    }
+  ]
+}
+```
+
+#### MonoGame Integration
+
+The generated map data is designed for consumption by MonoGame tile rendering libraries:
+
+```csharp
+// Example MonoGame integration
+public class TileMap
+{
+    public MapData Data { get; set; }
+    public Texture2D Atlas { get; set; }
+    
+    public void LoadMap(string mapPath, string atlasPath)
+    {
+        var json = File.ReadAllText(mapPath);
+        Data = JsonSerializer.Deserialize<MapData>(json);
+        Atlas = Content.Load<Texture2D>(atlasPath);
+    }
+    
+    public void RenderTileLayer(SpriteBatch spriteBatch, string layerName)
+    {
+        var layer = Data.TileLayers.First(l => l.Name == layerName);
+        var tileset = Data.Tilesets.First();
+        
+        for (int i = 0; i < layer.Tiles.Length; i++)
+        {
+            if (layer.Tiles[i] == 0) continue; // Empty tile
+            
+            var tileId = layer.Tiles[i] - tileset.FirstGid;
+            var x = (i % layer.Width) * Data.TileWidth;
+            var y = (i / layer.Width) * Data.TileHeight;
+            
+            // Render tile using atlas sprite data...
+        }
+    }
+}
+```
 
 ### Animation Configuration
 

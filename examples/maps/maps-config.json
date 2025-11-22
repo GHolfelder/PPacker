@@ -1,0 +1,21 @@
+{
+  "inputs": [
+    {
+      "tmxPath": "sample-map.tmx",
+      "prefix": "desert_"
+    }
+  ],
+  "output": {
+    "imagePath": "output/desert-atlas.png",
+    "dataPath": "output/desert-atlas.json",
+    "mapPath": "output/desert-map.json"
+  },
+  "atlas": {
+    "maxWidth": 512,
+    "maxHeight": 512,
+    "padding": 2,
+    "allowRotation": false,
+    "trimSprites": true,
+    "powerOfTwo": true
+  }
+}

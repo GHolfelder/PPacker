@@ -16,6 +16,8 @@ public class AtlasPacker
     private readonly bool _verbose;
     // Map of sprite name -> per-frame duration (ms) captured from input data (e.g., Aseprite)
     private readonly Dictionary<string, int> _frameDurations = new(StringComparer.Ordinal);
+    // Loaded TMX maps for processing
+    private readonly List<TiledMap> _loadedMaps = new();
 
     public AtlasPacker(PackerConfig config, bool verbose = false)
     {
@@ -84,6 +86,12 @@ public class AtlasPacker
             {
                 var animationCollection = CreateAnimationCollection(atlasData);
                 await SaveAnimationDataAsync(animationCollection, _config.Output.AnimationPath);
+            }
+
+            // Process and save map data if TMX files were loaded
+            if (_loadedMaps.Any() && !string.IsNullOrEmpty(_config.Output.MapPath))
+            {
+                await ProcessAndSaveMapDataAsync(atlasData, _config.Output.ImagePath, _config.Output.MapPath);
             }
 
             // Cleanup
@@ -254,6 +262,12 @@ public class AtlasPacker
             }
         }
 
+        // Process TMX files and add their images to sprites
+        if (_config.Inputs.Any(input => !string.IsNullOrEmpty(input.TmxPath)))
+        {
+            await LoadTmxSpritesAsync(allSprites);
+        }
+
         if (_verbose)
         {
             Console.WriteLine($"\n[VERBOSE] LoadAllSprites complete: {allSprites.Count} total sprite(s) loaded");
@@ -405,7 +419,10 @@ public class AtlasPacker
             {
                 Version = "1.0.0",
                 Generated = DateTime.UtcNow,
-                Sources = _config.Inputs.Select(i => i.ImagePath).ToList(),
+                Sources = _config.Inputs
+                    .Select(i => !string.IsNullOrEmpty(i.ImagePath) ? i.ImagePath : i.TmxPath)
+                    .Where(path => !string.IsNullOrEmpty(path))
+                    .ToList()!,
                 Settings = _config.Atlas
             }
         };
@@ -566,5 +583,170 @@ public class AtlasPacker
 
         await File.WriteAllTextAsync(outputPath, json);
         Console.WriteLine($"Animation data saved: {outputPath}");
+    }
+
+    /// <summary>
+    /// Load sprites from TMX files
+    /// </summary>
+    private async Task LoadTmxSpritesAsync(List<SpriteInfo> allSprites)
+    {
+        if (_verbose)
+        {
+            Console.WriteLine($"\n[VERBOSE] Processing TMX files...");
+        }
+
+        foreach (var input in _config.Inputs.Where(input => !string.IsNullOrEmpty(input.TmxPath)))
+        {
+            if (_verbose)
+            {
+                Console.WriteLine($"[VERBOSE] Loading TMX map: {input.TmxPath}");
+            }
+
+            try
+            {
+                // Load the TMX map
+                var map = await TiledMapProcessor.LoadMapAsync(input.TmxPath!, _verbose);
+                _loadedMaps.Add(map);
+
+                // Extract image paths from the map
+                var mapDirectory = Path.GetDirectoryName(input.TmxPath!) ?? string.Empty;
+                var imagePaths = TiledMapProcessor.ExtractImagePaths(map, mapDirectory, _verbose);
+
+                if (_verbose)
+                {
+                    Console.WriteLine($"[VERBOSE] Found {imagePaths.Count} image(s) in map");
+                }
+
+                // Load each image as a sprite
+                foreach (var imagePath in imagePaths)
+                {
+                    if (!File.Exists(imagePath))
+                    {
+                        Console.WriteLine($"Warning: Tileset image not found: {imagePath}");
+                        continue;
+                    }
+
+                    // Generate sprite name from image file
+                    var baseImageName = Path.GetFileNameWithoutExtension(imagePath);
+                    var spriteName = !string.IsNullOrEmpty(input.Prefix) 
+                        ? $"{input.Prefix}{baseImageName}"
+                        : baseImageName;
+
+                    if (_verbose)
+                    {
+                        Console.WriteLine($"[VERBOSE] Loading tileset image: {imagePath} as '{spriteName}'");
+                    }
+
+                    // Load the sprite
+                    var sprite = SpriteProcessor.LoadSprite(imagePath, spriteName, _config.Atlas.TrimSprites);
+                    allSprites.Add(sprite);
+
+                    if (_verbose)
+                    {
+                        Console.WriteLine($"[VERBOSE] Added tile sprite: '{sprite.Name}' ({sprite.Image.Width}x{sprite.Image.Height})");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading TMX file {input.TmxPath}: {ex.Message}");
+                if (_verbose)
+                {
+                    Console.WriteLine($"[VERBOSE] TMX loading error details: {ex}");
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Process and save map data for all loaded maps
+    /// </summary>
+    private async Task ProcessAndSaveMapDataAsync(AtlasData atlasData, string atlasImagePath, string mapOutputPath)
+    {
+        if (!_loadedMaps.Any())
+        {
+            if (_verbose)
+            {
+                Console.WriteLine($"[VERBOSE] No maps to process");
+            }
+            return;
+        }
+
+        if (_verbose)
+        {
+            Console.WriteLine($"[VERBOSE] Processing {_loadedMaps.Count} map(s) for output");
+        }
+
+        // Create mapping from image file names to sprite names in atlas
+        var imageToSpriteMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        
+        foreach (var sprite in atlasData.Sprites)
+        {
+            // Try to match by sprite name (assuming sprite name comes from image file name)
+            var spriteName = sprite.Name;
+            
+            // Remove any prefix to get the base image name
+            var baseSpriteName = spriteName;
+            foreach (var input in _config.Inputs.Where(i => !string.IsNullOrEmpty(i.Prefix)))
+            {
+                if (spriteName.StartsWith(input.Prefix!, StringComparison.Ordinal))
+                {
+                    baseSpriteName = spriteName.Substring(input.Prefix!.Length);
+                    break;
+                }
+            }
+
+            imageToSpriteMap[baseSpriteName] = spriteName;
+            
+            if (_verbose)
+            {
+                Console.WriteLine($"[VERBOSE] Mapped image '{baseSpriteName}' -> sprite '{spriteName}'");
+            }
+        }
+
+        // Process each map
+        var allMapData = new List<MapData>();
+        
+        foreach (var map in _loadedMaps)
+        {
+            if (_verbose)
+            {
+                Console.WriteLine($"[VERBOSE] Converting map to MonoGame format");
+            }
+
+            var mapData = TiledMapProcessor.ConvertToMapData(
+                map, 
+                imageToSpriteMap, 
+                Path.GetFileName(atlasImagePath), 
+                _verbose);
+            
+            allMapData.Add(mapData);
+        }
+
+        // Save map data
+        await SaveMapDataAsync(allMapData, mapOutputPath);
+    }
+
+    /// <summary>
+    /// Save map data to JSON file
+    /// </summary>
+    private async Task SaveMapDataAsync(List<MapData> mapDataList, string outputPath)
+    {
+        var directory = Path.GetDirectoryName(outputPath);
+        if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
+
+        // If there's only one map, save it directly. If multiple, save as array.
+        object outputData = mapDataList.Count == 1 ? mapDataList[0] : mapDataList;
+
+        var json = JsonSerializer.Serialize(outputData, new JsonSerializerOptions
+        {
+            WriteIndented = true
+        });
+
+        await File.WriteAllTextAsync(outputPath, json);
+        Console.WriteLine($"Map data saved: {outputPath} ({mapDataList.Count} map(s))");
     }
 }

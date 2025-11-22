@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="8" height="6" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="5">
+ <properties>
+  <property name="author" value="PPacker Example"/>
+  <property name="description" value="Simple test map for Tiled integration"/>
+ </properties>
+ <tileset firstgid="1" source="grass_tileset.tsx"/>
+ <layer id="1" name="Ground" width="8" height="6">
+  <properties>
+   <property name="layer_type" value="background"/>
+  </properties>
+  <data encoding="csv">
+1,1,2,1,1,1,2,1,
+1,2,1,1,2,1,1,1,
+1,1,1,5,5,1,1,2,
+2,1,1,5,5,1,1,1,
+1,1,2,1,1,2,1,1,
+1,2,1,1,1,1,2,1
+</data>
+ </layer>
+ <layer id="2" name="Water" width="8" height="6">
+  <properties>
+   <property name="layer_type" value="decoration"/>
+  </properties>
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,
+0,0,0,9,9,0,0,0,
+0,0,0,9,9,0,0,0,
+0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <objectgroup id="3" name="Objects">
+  <properties>
+   <property name="layer_type" value="collision"/>
+  </properties>
+  <object id="1" name="spawn_point" type="PlayerSpawn" x="32" y="32" width="32" height="32">
+   <properties>
+    <property name="team" value="blue"/>
+   </properties>
+  </object>
+  <object id="2" name="treasure_chest" type="Chest" x="160" y="96" width="32" height="32">
+   <properties>
+    <property name="contents" value="gold_coins"/>
+    <property name="locked" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="3" name="collision_area" type="CollisionBox" x="128" y="64" width="64" height="64">
+   <properties>
+    <property name="solid" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="4" name="patrol_path" type="Path" x="64" y="128">
+   <polyline points="0,0 64,0 64,32 0,32 0,0"/>
+   <properties>
+    <property name="speed" type="float" value="2.5"/>
+   </properties>
+  </object>
+ </objectgroup>
+</map>
