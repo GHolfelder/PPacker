@@ -54,6 +54,12 @@ public class InputConfig
     /// </summary>
     [JsonPropertyName("prefix")]
     public string? Prefix { get; set; }
+
+    /// <summary>
+    /// Path to Tiled map file (TMX) for tile map processing
+    /// </summary>
+    [JsonPropertyName("tmxPath")]
+    public string? TmxPath { get; set; }
 }
 
 /// <summary>
@@ -78,6 +84,12 @@ public class OutputConfig
     /// </summary>
     [JsonPropertyName("animationPath")]
     public string? AnimationPath { get; set; }
+
+    /// <summary>
+    /// Path to save map JSON file for Tiled maps (optional)
+    /// </summary>
+    [JsonPropertyName("mapPath")]
+    public string? MapPath { get; set; }
 }
 
 /// <summary>

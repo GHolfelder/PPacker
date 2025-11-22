@@ -1,0 +1,33 @@
+{
+  "width": 512,
+  "height": 256,
+  "sprites": [
+    {
+      "name": "desert_tmw_desert_spacing",
+      "x": 2,
+      "y": 2,
+      "width": 265,
+      "height": 199,
+      "rotated": false,
+      "sourceWidth": null,
+      "sourceHeight": null,
+      "trimX": null,
+      "trimY": null
+    }
+  ],
+  "metadata": {
+    "version": "1.0.0",
+    "generated": "2025-11-22T21:20:58.9248218Z",
+    "sources": [
+      "sample-map.tmx"
+    ],
+    "settings": {
+      "maxWidth": 512,
+      "maxHeight": 512,
+      "padding": 2,
+      "allowRotation": false,
+      "trimSprites": true,
+      "powerOfTwo": true
+    }
+  }
+}

@@ -326,9 +326,21 @@ ppacker --config ppacker-config.json
 
         foreach (var input in config.Inputs)
         {
-            if (string.IsNullOrEmpty(input.ImagePath))
+            if (string.IsNullOrEmpty(input.ImagePath) && string.IsNullOrEmpty(input.TmxPath))
             {
-                Console.WriteLine("Error: Input image path cannot be empty");
+                Console.WriteLine("Error: Input must specify either ImagePath or TmxPath");
+                return false;
+            }
+
+            if (!string.IsNullOrEmpty(input.ImagePath) && !string.IsNullOrEmpty(input.TmxPath))
+            {
+                Console.WriteLine("Error: Input cannot specify both ImagePath and TmxPath");
+                return false;
+            }
+
+            if (!string.IsNullOrEmpty(input.TmxPath) && !File.Exists(input.TmxPath))
+            {
+                Console.WriteLine($"Error: TMX file not found: {input.TmxPath}");
                 return false;
             }
         }
@@ -351,6 +363,14 @@ ppacker --config ppacker-config.json
             return false;
         }
 
+        // Validate map output path if TMX files are specified
+        var hasTmxFiles = config.Inputs.Any(input => !string.IsNullOrEmpty(input.TmxPath));
+        if (hasTmxFiles && string.IsNullOrEmpty(config.Output.MapPath))
+        {
+            Console.WriteLine("Error: MapPath is required when TMX files are specified");
+            return false;
+        }
+
         return true;
     }
 
@@ -359,12 +379,31 @@ ppacker --config ppacker-config.json
         Console.WriteLine();
         Console.WriteLine("Configuration Summary:");
         Console.WriteLine($"  Inputs: {config.Inputs.Count} file(s)");
+        
+        var imageInputs = config.Inputs.Count(input => !string.IsNullOrEmpty(input.ImagePath));
+        var tmxInputs = config.Inputs.Count(input => !string.IsNullOrEmpty(input.TmxPath));
+        
+        if (imageInputs > 0)
+        {
+            Console.WriteLine($"    - Image inputs: {imageInputs}");
+        }
+        if (tmxInputs > 0)
+        {
+            Console.WriteLine($"    - TMX map inputs: {tmxInputs}");
+        }
+        
         Console.WriteLine($"  Max Atlas Size: {config.Atlas.MaxWidth}x{config.Atlas.MaxHeight}");
         Console.WriteLine($"  Padding: {config.Atlas.Padding}px");
         Console.WriteLine($"  Allow Rotation: {config.Atlas.AllowRotation}");
         Console.WriteLine($"  Trim Sprites: {config.Atlas.TrimSprites}");
         Console.WriteLine($"  Power of Two: {config.Atlas.PowerOfTwo}");
         Console.WriteLine($"  Animations: {config.Animations?.Count ?? 0} defined");
+        
+        if (!string.IsNullOrEmpty(config.Output.MapPath))
+        {
+            Console.WriteLine($"  Map Output: {config.Output.MapPath}");
+        }
+        
         Console.WriteLine();
     }
 }

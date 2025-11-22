@@ -1,0 +1,21 @@
+{
+  "inputs": [
+    {
+      "tmxPath": "simple_map.tmx",
+      "prefix": "map_"
+    }
+  ],
+  "output": {
+    "imagePath": "output/atlas.png",
+    "dataPath": "output/atlas.json",
+    "mapPath": "output/map.json"
+  },
+  "atlas": {
+    "maxWidth": 512,
+    "maxHeight": 512,
+    "padding": 2,
+    "allowRotation": false,
+    "trimSprites": true,
+    "powerOfTwo": true
+  }
+}
