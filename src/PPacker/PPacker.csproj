@@ -7,14 +7,14 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyTitle>PPacker</AssemblyTitle>
     <AssemblyDescription>MonoGame texture atlas packer and sprite animation tool</AssemblyDescription>
-    <AssemblyVersion>1.0.7.0</AssemblyVersion>
-    <FileVersion>1.0.7.0</FileVersion>
-    <AssemblyInformationalVersion>1.0.7</AssemblyInformationalVersion>
-    <Version>1.0.7</Version>
+    <AssemblyVersion>1.0.8.0</AssemblyVersion>
+    <FileVersion>1.0.8.0</FileVersion>
+    <AssemblyInformationalVersion>1.0.8</AssemblyInformationalVersion>
+    <Version>1.0.8</Version>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     <Copyright>Copyright © 2025</Copyright>
     <PackageId>PPacker</PackageId>
-  <PackageVersion>1.0.7</PackageVersion>
+  <PackageVersion>1.0.8</PackageVersion>
     <Authors>PPacker Contributors</Authors>
     <PackageDescription>A command-line tool for packing PNG files into texture atlases for MonoGame projects, with sprite animation support.</PackageDescription>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
