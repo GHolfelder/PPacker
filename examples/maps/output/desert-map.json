@@ -636,7 +636,170 @@
       "properties": {}
     }
   ],
-  "objectLayers": [],
+  "objectLayers": [
+    {
+      "id": 2,
+      "name": "Game Objects",
+      "opacity": 1,
+      "visible": true,
+      "offsetX": 0,
+      "offsetY": 0,
+      "objects": [
+        {
+          "id": 1,
+          "name": "Player Spawn",
+          "type": "spawn_point",
+          "objectType": "rectangle",
+          "x": 64,
+          "y": 64,
+          "width": 32,
+          "height": 32,
+          "rotation": 0,
+          "gid": 0,
+          "visible": true,
+          "polygon": null,
+          "polyline": null,
+          "text": null,
+          "properties": {}
+        },
+        {
+          "id": 2,
+          "name": "Coin Area",
+          "type": "collectible_zone",
+          "objectType": "ellipse",
+          "x": 320,
+          "y": 128,
+          "width": 64,
+          "height": 48,
+          "rotation": 0,
+          "gid": 0,
+          "visible": true,
+          "polygon": null,
+          "polyline": null,
+          "text": null,
+          "properties": {}
+        },
+        {
+          "id": 3,
+          "name": "Checkpoint",
+          "type": "checkpoint",
+          "objectType": "point",
+          "x": 480,
+          "y": 192,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "gid": 0,
+          "visible": true,
+          "polygon": null,
+          "polyline": null,
+          "text": null,
+          "properties": {}
+        },
+        {
+          "id": 4,
+          "name": "Platform Shape",
+          "type": "collision",
+          "objectType": "polygon",
+          "x": 128,
+          "y": 256,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "gid": 0,
+          "visible": true,
+          "polygon": [
+            {
+              "x": 0,
+              "y": 0
+            },
+            {
+              "x": 96,
+              "y": 0
+            },
+            {
+              "x": 96,
+              "y": 16
+            },
+            {
+              "x": 80,
+              "y": 32
+            },
+            {
+              "x": 16,
+              "y": 32
+            },
+            {
+              "x": 0,
+              "y": 16
+            }
+          ],
+          "polyline": null,
+          "text": null,
+          "properties": {}
+        },
+        {
+          "id": 5,
+          "name": "Enemy Path",
+          "type": "path",
+          "objectType": "polyline",
+          "x": 600,
+          "y": 200,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "gid": 0,
+          "visible": true,
+          "polygon": null,
+          "polyline": [
+            {
+              "x": 0,
+              "y": 0
+            },
+            {
+              "x": 64,
+              "y": -32
+            },
+            {
+              "x": 128,
+              "y": 0
+            },
+            {
+              "x": 192,
+              "y": 32
+            }
+          ],
+          "text": null,
+          "properties": {}
+        },
+        {
+          "id": 6,
+          "name": "Sign Text",
+          "type": "info",
+          "objectType": "text",
+          "x": 256,
+          "y": 320,
+          "width": 128,
+          "height": 48,
+          "rotation": 0,
+          "gid": 0,
+          "visible": true,
+          "polygon": null,
+          "polyline": null,
+          "text": {
+            "fontFamily": "Arial",
+            "pixelSize": 16,
+            "color": "#000000",
+            "bold": false,
+            "italic": false,
+            "content": "Welcome to Level 1!"
+          },
+          "properties": {}
+        }
+      ],
+      "properties": {}
+    }
+  ],
   "imageLayers": [],
   "properties": {},
   "atlasFile": "desert-atlas.png"
