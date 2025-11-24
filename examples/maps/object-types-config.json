@@ -1,0 +1,21 @@
+{
+  "inputs": [
+    {
+      "tmxPath": "object-types-test.tmx",
+      "prefix": "test_"
+    }
+  ],
+  "output": {
+    "imagePath": "output/object-types-atlas.png",
+    "dataPath": "output/object-types-atlas.json",
+    "mapPath": "output/object-types-map.json"
+  },
+  "atlas": {
+    "maxWidth": 512,
+    "maxHeight": 512,
+    "padding": 2,
+    "allowRotation": false,
+    "trimSprites": true,
+    "powerOfTwo": true
+  }
+}

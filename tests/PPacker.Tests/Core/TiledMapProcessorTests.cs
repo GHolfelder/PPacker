@@ -280,6 +280,81 @@ namespace PPacker.Tests.Core
         }
 
         [Fact]
+        public async Task ConvertToMapData_ShouldCorrectlyDetectObjectTypes()
+        {
+            // Arrange
+            var tmxContent = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="10" height="10" tilewidth="32" tileheight="32" infinite="0" nextlayerid="2" nextobjectid="8">
+                 <objectgroup id="1" name="Test Objects">
+                  <object id="1" name="Rectangle" type="collision" x="32" y="32" width="64" height="48"/>
+                  <object id="2" name="Ellipse" type="area" x="128" y="32" width="64" height="48">
+                   <ellipse/>
+                  </object>
+                  <object id="3" name="Circle" type="area" x="224" y="32" width="48" height="48">
+                   <ellipse/>
+                  </object>
+                  <object id="4" name="Point" type="spawn" x="320" y="56">
+                   <point/>
+                  </object>
+                  <object id="5" name="Polygon" type="platform" x="32" y="128" width="80" height="60">
+                   <polygon points="0,0 80,0 60,30 20,60 0,60"/>
+                  </object>
+                  <object id="6" name="Polyline" type="path" x="128" y="128">
+                   <polyline points="0,0 40,20 80,10 120,30"/>
+                  </object>
+                  <object id="7" name="Text" type="sign" x="224" y="128" width="96" height="32">
+                   <text fontfamily="Arial" pixelsize="14" color="#ff0000" bold="1">Hello World!</text>
+                  </object>
+                 </objectgroup>
+                </map>
+                """;
+
+            var testObjectTmxPath = Path.Combine(_tempDir, "object_test.tmx");
+            await File.WriteAllTextAsync(testObjectTmxPath, tmxContent);
+
+            // Act
+            var map = await TiledMapProcessor.LoadMapAsync(testObjectTmxPath);
+            var imageToSpriteMap = new Dictionary<string, string>();
+            var mapData = TiledMapProcessor.ConvertToMapData(map, imageToSpriteMap, "test.png");
+
+            // Assert
+            Assert.Single(mapData.ObjectLayers);
+            var objectLayer = mapData.ObjectLayers[0];
+            Assert.Equal(7, objectLayer.Objects.Count);
+
+            // Verify object types
+            var rectangle = objectLayer.Objects.First(o => o.Name == "Rectangle");
+            Assert.Equal("rectangle", rectangle.ObjectType);
+
+            var ellipse = objectLayer.Objects.First(o => o.Name == "Ellipse");
+            Assert.Equal("ellipse", ellipse.ObjectType);
+
+            var circle = objectLayer.Objects.First(o => o.Name == "Circle");
+            Assert.Equal("circle", circle.ObjectType);
+
+            var point = objectLayer.Objects.First(o => o.Name == "Point");
+            Assert.Equal("point", point.ObjectType);
+
+            var polygon = objectLayer.Objects.First(o => o.Name == "Polygon");
+            Assert.Equal("polygon", polygon.ObjectType);
+            Assert.NotNull(polygon.Polygon);
+            Assert.Equal(5, polygon.Polygon.Count);
+
+            var polyline = objectLayer.Objects.First(o => o.Name == "Polyline");
+            Assert.Equal("polyline", polyline.ObjectType);
+            Assert.NotNull(polyline.Polyline);
+            Assert.Equal(4, polyline.Polyline.Count);
+
+            var text = objectLayer.Objects.First(o => o.Name == "Text");
+            Assert.Equal("text", text.ObjectType);
+            Assert.NotNull(text.Text);
+            Assert.Equal("Hello World!", text.Text.Content);
+            Assert.Equal("Arial", text.Text.FontFamily);
+            Assert.True(text.Text.Bold);
+        }
+
+        [Fact]
         public async Task LoadMapAsync_ShouldThrowForNonExistentFile()
         {
             // Act & Assert

@@ -544,21 +544,29 @@ public static class TiledMapProcessor
             Properties = ParseProperties(obj.Properties)
         };
 
-        // Parse polygon points
-        if (obj.Polygon != null && !string.IsNullOrEmpty(obj.Polygon.Points))
+        // Determine object geometry type based on XML elements present
+        if (obj.Point != null)
         {
+            mapObject.ObjectType = "point";
+        }
+        else if (obj.Ellipse != null)
+        {
+            // Check if it's a circle (width == height) or ellipse
+            mapObject.ObjectType = Math.Abs(obj.Width - obj.Height) < 0.001f ? "circle" : "ellipse";
+        }
+        else if (obj.Polygon != null && !string.IsNullOrEmpty(obj.Polygon.Points))
+        {
+            mapObject.ObjectType = "polygon";
             mapObject.Polygon = ParsePoints(obj.Polygon.Points);
         }
-
-        // Parse polyline points
-        if (obj.Polyline != null && !string.IsNullOrEmpty(obj.Polyline.Points))
+        else if (obj.Polyline != null && !string.IsNullOrEmpty(obj.Polyline.Points))
         {
+            mapObject.ObjectType = "polyline";
             mapObject.Polyline = ParsePoints(obj.Polyline.Points);
         }
-
-        // Convert text
-        if (obj.Text != null)
+        else if (obj.Text != null)
         {
+            mapObject.ObjectType = "text";
             mapObject.Text = new MapText
             {
                 FontFamily = obj.Text.FontFamily,
@@ -568,6 +576,15 @@ public static class TiledMapProcessor
                 Italic = obj.Text.Italic == 1,
                 Content = obj.Text.Content
             };
+        }
+        else if (obj.Gid > 0)
+        {
+            mapObject.ObjectType = "tile";
+        }
+        else
+        {
+            // Default to rectangle for regular objects with width/height
+            mapObject.ObjectType = "rectangle";
         }
 
         return mapObject;

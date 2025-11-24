@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="10" height="10" tilewidth="32" tileheight="32" infinite="0" nextlayerid="2" nextobjectid="8">
+ <objectgroup id="1" name="Test Objects">
+  <object id="1" name="Rectangle" type="collision" x="32" y="32" width="64" height="48"/>
+  <object id="2" name="Ellipse" type="area" x="128" y="32" width="64" height="48">
+   <ellipse/>
+  </object>
+  <object id="3" name="Circle" type="area" x="224" y="32" width="48" height="48">
+   <ellipse/>
+  </object>
+  <object id="4" name="Point" type="spawn" x="320" y="56">
+   <point/>
+  </object>
+  <object id="5" name="Polygon" type="platform" x="32" y="128" width="80" height="60">
+   <polygon points="0,0 80,0 60,30 20,60 0,60"/>
+  </object>
+  <object id="6" name="Polyline" type="path" x="128" y="128">
+   <polyline points="0,0 40,20 80,10 120,30"/>
+  </object>
+  <object id="7" name="Text" type="sign" x="224" y="128" width="96" height="32">
+   <text fontfamily="Arial" pixelsize="14" color="#ff0000" bold="1">Hello World!</text>
+  </object>
+ </objectgroup>
+</map>

@@ -25,4 +25,22 @@
 30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30
 </data>
  </layer>
+ <objectgroup id="2" name="Game Objects">
+  <object id="1" name="Player Spawn" type="spawn_point" x="64" y="64" width="32" height="32"/>
+  <object id="2" name="Coin Area" type="collectible_zone" x="320" y="128" width="64" height="48">
+   <ellipse/>
+  </object>
+  <object id="3" name="Checkpoint" type="checkpoint" x="480" y="192">
+   <point/>
+  </object>
+  <object id="4" name="Platform Shape" type="collision" x="128" y="256">
+   <polygon points="0,0 96,0 96,16 80,32 16,32 0,16"/>
+  </object>
+  <object id="5" name="Enemy Path" type="path" x="600" y="200">
+   <polyline points="0,0 64,-32 128,0 192,32"/>
+  </object>
+  <object id="6" name="Sign Text" type="info" x="256" y="320" width="128" height="48">
+   <text fontfamily="Arial" pixelsize="16" color="#000000">Welcome to Level 1!</text>
+  </object>
+ </objectgroup>
 </map>

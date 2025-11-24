@@ -416,6 +416,12 @@ public class MapObject
     public string? Type { get; set; }
 
     /// <summary>
+    /// Object geometry type (rectangle, ellipse, circle, point, polygon, polyline, text, tile)
+    /// </summary>
+    [JsonPropertyName("objectType")]
+    public string ObjectType { get; set; } = "rectangle";
+
+    /// <summary>
     /// X position in pixels
     /// </summary>
     [JsonPropertyName("x")]

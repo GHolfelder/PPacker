@@ -515,6 +515,18 @@ public class TiledObject
     public TiledPolyline? Polyline { get; set; }
 
     /// <summary>
+    /// Ellipse element (indicates object is an ellipse)
+    /// </summary>
+    [XmlElement("ellipse")]
+    public TiledEllipse? Ellipse { get; set; }
+
+    /// <summary>
+    /// Point element (indicates object is a point)
+    /// </summary>
+    [XmlElement("point")]
+    public TiledPoint? Point { get; set; }
+
+    /// <summary>
     /// Text content
     /// </summary>
     [XmlElement("text")]
@@ -724,4 +736,20 @@ public class TiledText
     /// </summary>
     [XmlText]
     public string Content { get; set; } = string.Empty;
+}
+
+/// <summary>
+/// Ellipse element (empty tag indicating object is an ellipse)
+/// </summary>
+public class TiledEllipse
+{
+    // Empty class - presence of this element indicates ellipse type
+}
+
+/// <summary>
+/// Point element (empty tag indicating object is a point)
+/// </summary>
+public class TiledPoint
+{
+    // Empty class - presence of this element indicates point type
 }
