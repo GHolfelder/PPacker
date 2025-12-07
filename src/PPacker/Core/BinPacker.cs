@@ -151,33 +151,88 @@ public class BinPacker
         if (width > _maxWidth || height > _maxHeight)
             return null;
 
-        var bestPosition = (X: 0, Y: 0);
-        var bestWaste = int.MaxValue;
-        var found = false;
+        // Bottom-Left Fill algorithm: find the bottom-most, then left-most position
+        int bestX = int.MaxValue;
+        int bestY = int.MaxValue;
+        bool found = false;
 
-        // Try all possible positions using a simple grid approach
-        for (int y = 0; y <= _maxHeight - height; y++)
+        // For each existing rectangle, try placing the new rectangle:
+        // 1. To the right of it (right edge alignment)
+        // 2. Above it (top edge alignment)
+        foreach (var existing in _packedRectangles)
         {
-            for (int x = 0; x <= _maxWidth - width; x++)
+            // Try placing to the right of existing rectangle
+            int candidateX = existing.X + existing.Width + _padding;
+            int candidateY = existing.Y;
+            
+            if (CanPlaceAt(candidateX, candidateY, width, height))
             {
-                if (CanPlaceAt(x, y, width, height))
+                // Prefer bottom-most position, then left-most
+                if (candidateY < bestY || (candidateY == bestY && candidateX < bestX))
                 {
-                    var waste = CalculateWaste(x, y, width, height);
-                    if (waste < bestWaste)
-                    {
-                        bestWaste = waste;
-                        bestPosition = (x, y);
-                        found = true;
-                    }
+                    bestX = candidateX;
+                    bestY = candidateY;
+                    found = true;
+                }
+            }
+            
+            // Try placing above existing rectangle
+            candidateX = existing.X;
+            candidateY = existing.Y + existing.Height + _padding;
+            
+            if (CanPlaceAt(candidateX, candidateY, width, height))
+            {
+                // Prefer bottom-most position, then left-most
+                if (candidateY < bestY || (candidateY == bestY && candidateX < bestX))
+                {
+                    bestX = candidateX;
+                    bestY = candidateY;
+                    found = true;
                 }
             }
         }
+        
+        // Also try placing at origin (0,0) if no rectangles exist or it fits
+        if (CanPlaceAt(0, 0, width, height))
+        {
+            if (0 < bestY || (0 == bestY && 0 < bestX))
+            {
+                bestX = 0;
+                bestY = 0;
+                found = true;
+            }
+        }
+        
+        // If no position found using edge placement, fall back to scanning
+        // This ensures we don't miss valid positions
+        if (!found)
+        {
+            // Scan row by row, left to right
+            for (int y = 0; y <= _maxHeight - height; y++)
+            {
+                for (int x = 0; x <= _maxWidth - width; x++)
+                {
+                    if (CanPlaceAt(x, y, width, height))
+                    {
+                        bestX = x;
+                        bestY = y;
+                        found = true;
+                        break;
+                    }
+                }
+                if (found) break;
+            }
+        }
 
-        return found ? bestPosition : null;
+        return found ? (bestX, bestY) : null;
     }
 
     private bool CanPlaceAt(int x, int y, int width, int height)
     {
+        // Check if rectangle fits within atlas boundaries
+        if (x + width > _maxWidth || y + height > _maxHeight)
+            return false;
+
         var newRect = new PackingRect(x, y, width, height);
 
         foreach (var existing in _packedRectangles)
@@ -201,12 +256,6 @@ public class BinPacker
                rect1.X + rect1.Width > rect2.X &&
                rect1.Y < rect2.Y + rect2.Height &&
                rect1.Y + rect1.Height > rect2.Y;
-    }
-
-    private int CalculateWaste(int x, int y, int width, int height)
-    {
-        // Simple waste calculation - prefer bottom-left positions
-        return x + y;
     }
 
     private double CalculateEfficiency(int usedWidth, int usedHeight)
