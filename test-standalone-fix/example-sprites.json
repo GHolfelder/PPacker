@@ -1,0 +1,55 @@
+{
+  "width": 512,
+  "height": 256,
+  "sprites": [
+    {
+      "name": "enemy_goblin",
+      "x": 0,
+      "y": 0,
+      "width": 32,
+      "height": 32,
+      "rotated": false,
+      "sourceWidth": null,
+      "sourceHeight": null,
+      "trimX": null,
+      "trimY": null
+    },
+    {
+      "name": "enemy_orc",
+      "x": 32,
+      "y": 0,
+      "width": 48,
+      "height": 48,
+      "rotated": false,
+      "sourceWidth": null,
+      "sourceHeight": null,
+      "trimX": null,
+      "trimY": null
+    },
+    {
+      "name": "enemy_dragon",
+      "x": 80,
+      "y": 0,
+      "width": 64,
+      "height": 64,
+      "rotated": false,
+      "sourceWidth": null,
+      "sourceHeight": null,
+      "trimX": null,
+      "trimY": null
+    }
+  ],
+  "metadata": {
+    "version": "1.0.0",
+    "generated": "2025-12-07T03:25:12.2611182Z",
+    "sources": [],
+    "settings": {
+      "maxWidth": 2048,
+      "maxHeight": 2048,
+      "padding": 1,
+      "allowRotation": false,
+      "trimSprites": true,
+      "powerOfTwo": true
+    }
+  }
+}

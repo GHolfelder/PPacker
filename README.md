@@ -7,7 +7,7 @@ A powerful command-line tool for packing PNG files into texture atlases for Mono
 - **Texture Atlas Packing**: Efficiently pack multiple PNG files into a single texture atlas
 - **Sprite Data Merging**: Merge JSON sprite definitions and automatically update coordinates
 - **Aseprite Support**: Native support for Aseprite JSON exports - automatically detects and parses frame data
-- **Tiled Map Support**: Process Tiled TMX map files and TSX tilesets with comprehensive layer and object support
+- **Tiled Map Support**: Process Tiled TMX map files and TSX tilesets with comprehensive layer and object support, including automatic object geometry detection
 - **Animation Support**: Create animation definitions from sprite sequences with pattern matching
 - **Flexible Input**: Support for individual sprites, existing sprite sheets, Aseprite exports, or Tiled maps
 - **Smart Packing**: Bin packing algorithm with optional rotation for optimal space usage
@@ -319,6 +319,7 @@ When processing TMX files, PPacker generates a `maps.json` file containing:
         {
           "name": "player_spawn",
           "type": "PlayerSpawn",
+          "objectType": "point",
           "x": 64,
           "y": 96,
           "properties": { "team": "blue" }
@@ -465,6 +466,56 @@ Perfect for troubleshooting when sprites don't appear in the final atlas!
 ppacker example --output ./examples
 ```
 
+## Enhanced Features (v1.0.9)
+
+### Bug Fixes and Security Updates
+Critical improvements to packing reliability and dependency security:
+
+- **Bin Packer Boundary Fix**: Fixed issue where sprites could be positioned beyond atlas boundaries, causing missing sprites on edges
+- **Security Update**: Updated SixLabors.ImageSharp from v3.1.7 to v3.1.12 to resolve security vulnerability (GHSA-rxmq-m78w-7wmc)
+- **Improved Validation**: Enhanced boundary checks ensure all sprites fit properly within atlas dimensions
+- **Clean Builds**: Eliminated security warnings from build output
+
+## Enhanced Features (v1.0.8)
+
+### Object Geometry Type Detection
+PPacker now provides comprehensive object type identification for Tiled map objects, enabling precise shape-based game logic:
+
+- **Automatic Classification**: Detect rectangles, ellipses, circles, points, polygons, polylines, text, and tile objects
+- **MonoGame Integration**: Enhanced JSON output with `objectType` field for game development workflows
+- **Shape-Specific Logic**: Enable different handling for different object geometries in your game code
+- **Comprehensive Support**: All Tiled object types supported with full geometry data preservation
+
+```json
+{
+  "objects": [
+    {
+      "name": "player_spawn",
+      "type": "PlayerSpawn",
+      "objectType": "point",
+      "x": 64,
+      "y": 96,
+      "properties": { "team": "blue" }
+    },
+    {
+      "name": "collision_area", 
+      "type": "Collision",
+      "objectType": "rectangle",
+      "x": 128,
+      "y": 64,
+      "width": 64,
+      "height": 32
+    },
+    {
+      "name": "enemy_path",
+      "type": "Path", 
+      "objectType": "polyline",
+      "polyline": [{"x": 0, "y": 0}, {"x": 64, "y": 32}]
+    }
+  ]
+}
+```
+
 ## Enhanced Features (v1.0.7)
 
 ### Comprehensive Tiled Map Support
@@ -474,7 +525,7 @@ PPacker now provides full integration with Tiled map files (TMX/TSX), enabling s
 - **Multi-Layer Support**: Handle tile layers, object layers, and image layers with all properties preserved  
 - **Data Format Support**: CSV and Base64 encoding with GZIP/ZLIB compression for layer data
 - **Atlas Integration**: Automatically pack tileset images and generate sprite mappings for MonoGame
-- **Object Support**: Full support for all object types (rectangles, polygons, polylines, text objects)
+- **Object Support**: Full support for all object types with automatic geometry detection (rectangles, ellipses, circles, points, polygons, polylines, text objects)
 - **Animation Support**: Tile animations converted to MonoGame-compatible format
 - **Property Preservation**: All custom properties from maps, layers, tilesets, and objects maintained
 - **MonoGame Output**: Generate JSON map data optimized for MonoGame tile rendering libraries
@@ -548,7 +599,7 @@ A PNG file containing all packed sprites.
     }
   ],
   "metadata": {
-  "version": "1.0.7",
+  "version": "1.0.9",
     "generated": "2025-11-08T10:00:00Z",
     "sources": ["sprites/player.png"],
     "settings": { /* atlas configuration */ }
