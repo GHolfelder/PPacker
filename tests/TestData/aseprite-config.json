@@ -2,7 +2,7 @@
     "inputs": [
         {
             "imagePath": "./player/walk/walk_E.png",
-            "dataPath": "./test-aseprite.json",
+            "dataPath": "./aseprite-data.json",
             "prefix": "player_"
         }
     ],
