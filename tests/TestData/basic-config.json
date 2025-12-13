@@ -10,8 +10,8 @@
         }
     ],
     "output": {
-        "imagePath": "../Content/images/atlas.png",
-        "dataPath": "../Content/images/atlas.json"
+        "imagePath": "./test-output/atlas.png",
+        "dataPath": "./test-output/atlas.json"
     },
     "atlas": {
         "maxWidth": 2048,
