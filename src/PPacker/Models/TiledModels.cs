@@ -136,6 +136,18 @@ public class TiledTilesetRef
     public int Columns { get; set; }
 
     /// <summary>
+    /// Margin around the tileset image
+    /// </summary>
+    [XmlAttribute("margin")]
+    public int Margin { get; set; }
+
+    /// <summary>
+    /// Spacing between tiles
+    /// </summary>
+    [XmlAttribute("spacing")]
+    public int Spacing { get; set; }
+
+    /// <summary>
     /// Image for inline tileset
     /// </summary>
     [XmlElement("image")]

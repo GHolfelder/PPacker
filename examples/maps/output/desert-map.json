@@ -17,7 +17,65 @@
       "margin": 0,
       "spacing": 0,
       "atlasSprite": "desert_tmw_desert_spacing",
-      "tiles": [],
+      "tiles": [
+        {
+          "id": 40,
+          "type": null,
+          "atlasSprite": null,
+          "animation": [
+            {
+              "tileId": 21,
+              "duration": 100,
+              "sourceX": 166,
+              "sourceY": 67,
+              "sourceWidth": 32,
+              "sourceHeight": 32
+            },
+            {
+              "tileId": 21,
+              "duration": 100,
+              "sourceX": 166,
+              "sourceY": 67,
+              "sourceWidth": 32,
+              "sourceHeight": 32
+            },
+            {
+              "tileId": 22,
+              "duration": 100,
+              "sourceX": 199,
+              "sourceY": 67,
+              "sourceWidth": 32,
+              "sourceHeight": 32
+            },
+            {
+              "tileId": 22,
+              "duration": 100,
+              "sourceX": 199,
+              "sourceY": 67,
+              "sourceWidth": 32,
+              "sourceHeight": 32
+            },
+            {
+              "tileId": 23,
+              "duration": 100,
+              "sourceX": 232,
+              "sourceY": 67,
+              "sourceWidth": 32,
+              "sourceHeight": 32
+            },
+            {
+              "tileId": 23,
+              "duration": 100,
+              "sourceX": 232,
+              "sourceY": 67,
+              "sourceWidth": 32,
+              "sourceHeight": 32
+            }
+          ],
+          "collisionObjects": null,
+          "properties": {}
+        }
+      ],
       "properties": {}
     }
   ],
@@ -318,7 +376,7 @@
         30,
         30,
         30,
-        30,
+        41,
         30,
         30,
         30,
@@ -789,7 +847,7 @@
           "text": {
             "fontFamily": "Arial",
             "pixelSize": 16,
-            "color": "#000000",
+            "color": null,
             "bold": false,
             "italic": false,
             "content": "Welcome to Level 1!"
