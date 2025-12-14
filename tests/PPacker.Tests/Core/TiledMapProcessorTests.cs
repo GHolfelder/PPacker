@@ -363,6 +363,103 @@ namespace PPacker.Tests.Core
         }
 
         [Fact]
+        public async Task LoadMapAsync_ShouldParseAnimatedTiles()
+        {
+            // Act
+            var map = await TiledMapProcessor.LoadMapAsync(_testTmxPath);
+
+            // Assert
+            Assert.NotNull(map);
+            Assert.Single(map.Tilesets);
+            var tileset = map.Tilesets[0];
+            
+            // Find the animated tile (id=3 from CreateTestFiles)
+            var animatedTile = tileset.Tiles.FirstOrDefault(t => t.Id == 3);
+            Assert.NotNull(animatedTile);
+            Assert.NotNull(animatedTile.Animation);
+            Assert.Equal(2, animatedTile.Animation.Count);
+            
+            // Verify animation frames
+            var frame1 = animatedTile.Animation[0];
+            Assert.Equal(3, frame1.TileId);
+            Assert.Equal(250, frame1.Duration);
+            
+            var frame2 = animatedTile.Animation[1];
+            Assert.Equal(2, frame2.TileId);
+            Assert.Equal(250, frame2.Duration);
+        }
+
+        [Fact]
+        public void ConvertToMapData_ShouldPreserveAnimationData()
+        {
+            // Arrange
+            var map = new TiledMap
+            {
+                Width = 4, Height = 3, TileWidth = 32, TileHeight = 32,
+                Tilesets = new List<TiledTilesetRef>
+                {
+                    new TiledTilesetRef
+                    {
+                        FirstGid = 1, Name = "animated_tileset",
+                        TileWidth = 32, TileHeight = 32, Columns = 8,
+                        Margin = 1, Spacing = 1, // From sample-set.tsx
+                        Tiles = new List<TiledTile>
+                        {
+                            new TiledTile
+                            {
+                                Id = 5,
+                                Animation = new List<TiledAnimationFrame>
+                                {
+                                    new TiledAnimationFrame { TileId = 0, Duration = 100 },
+                                    new TiledAnimationFrame { TileId = 1, Duration = 200 },
+                                    new TiledAnimationFrame { TileId = 8, Duration = 150 } // Second row, first column
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            var imageToSpriteMap = new Dictionary<string, string>();
+
+            // Act
+            var mapData = TiledMapProcessor.ConvertToMapData(map, imageToSpriteMap, "atlas.png");
+
+            // Assert
+            Assert.Single(mapData.Tilesets);
+            var convertedTileset = mapData.Tilesets[0];
+            Assert.Single(convertedTileset.Tiles);
+            
+            var convertedTile = convertedTileset.Tiles[0];
+            Assert.Equal(5, convertedTile.Id);
+            Assert.NotNull(convertedTile.Animation);
+            Assert.Equal(3, convertedTile.Animation.Count);
+
+            // Verify first frame (tile 0: col=0, row=0)
+            var frame1 = convertedTile.Animation[0];
+            Assert.Equal(0, frame1.TileId);
+            Assert.Equal(100, frame1.Duration);
+            Assert.Equal(32, frame1.SourceWidth);
+            Assert.Equal(32, frame1.SourceHeight);
+            Assert.Equal(1, frame1.SourceX); // margin + 0 * (tileWidth + spacing) = 1 + 0 * 33 = 1
+            Assert.Equal(1, frame1.SourceY); // margin + 0 * (tileHeight + spacing) = 1 + 0 * 33 = 1
+
+            // Verify second frame (tile 1: col=1, row=0)
+            var frame2 = convertedTile.Animation[1];
+            Assert.Equal(1, frame2.TileId);
+            Assert.Equal(200, frame2.Duration);
+            Assert.Equal(34, frame2.SourceX); // margin + 1 * (tileWidth + spacing) = 1 + 1 * 33 = 34
+            Assert.Equal(1, frame2.SourceY); // margin + 0 * (tileHeight + spacing) = 1 + 0 * 33 = 1
+
+            // Verify third frame (tile 8: col=0, row=1)
+            var frame3 = convertedTile.Animation[2];
+            Assert.Equal(8, frame3.TileId);
+            Assert.Equal(150, frame3.Duration);
+            Assert.Equal(1, frame3.SourceX); // margin + 0 * (tileWidth + spacing) = 1 + 0 * 33 = 1
+            Assert.Equal(34, frame3.SourceY); // margin + 1 * (tileHeight + spacing) = 1 + 1 * 33 = 34
+        }
+
+        [Fact]
         public async Task LoadTilesetAsync_ShouldThrowForNonExistentFile()
         {
             // Act & Assert

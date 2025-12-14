@@ -216,6 +216,30 @@ public class MapAnimationFrame
     /// </summary>
     [JsonPropertyName("duration")]
     public int Duration { get; set; }
+
+    /// <summary>
+    /// Source rectangle within the tileset sprite (X position)
+    /// </summary>
+    [JsonPropertyName("sourceX")]
+    public int SourceX { get; set; }
+
+    /// <summary>
+    /// Source rectangle within the tileset sprite (Y position)
+    /// </summary>
+    [JsonPropertyName("sourceY")]
+    public int SourceY { get; set; }
+
+    /// <summary>
+    /// Source rectangle width (tile width)
+    /// </summary>
+    [JsonPropertyName("sourceWidth")]
+    public int SourceWidth { get; set; }
+
+    /// <summary>
+    /// Source rectangle height (tile height)
+    /// </summary>
+    [JsonPropertyName("sourceHeight")]
+    public int SourceHeight { get; set; }
 }
 
 /// <summary>
