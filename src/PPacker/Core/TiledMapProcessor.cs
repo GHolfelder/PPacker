@@ -65,6 +65,8 @@ public static class TiledMapProcessor
                 tilesetRef.TileHeight = tileset.TileHeight;
                 tilesetRef.TileCount = tileset.TileCount;
                 tilesetRef.Columns = tileset.Columns;
+                tilesetRef.Margin = tileset.Margin;
+                tilesetRef.Spacing = tileset.Spacing;
                 tilesetRef.Image = tileset.Image;
                 tilesetRef.Tiles = tileset.Tiles;
                 tilesetRef.Properties = tileset.Properties;
@@ -406,7 +408,7 @@ public static class TiledMapProcessor
         // Convert individual tiles
         foreach (var tile in tileset.Tiles)
         {
-            var mapTile = ConvertTile(tile, imageToSpriteMap, verbose);
+            var mapTile = ConvertTile(tile, tileset, imageToSpriteMap, verbose);
             mapTileset.Tiles.Add(mapTile);
         }
 
@@ -416,7 +418,7 @@ public static class TiledMapProcessor
     /// <summary>
     /// Convert tile to map tile
     /// </summary>
-    private static MapTile ConvertTile(TiledTile tile, Dictionary<string, string> imageToSpriteMap, bool verbose = false)
+    private static MapTile ConvertTile(TiledTile tile, TiledTilesetRef tileset, Dictionary<string, string> imageToSpriteMap, bool verbose = false)
     {
         var mapTile = new MapTile
         {
@@ -438,11 +440,7 @@ public static class TiledMapProcessor
         // Convert animation
         if (tile.Animation != null && tile.Animation.Count > 0)
         {
-            mapTile.Animation = tile.Animation.Select(frame => new MapAnimationFrame
-            {
-                TileId = frame.TileId,
-                Duration = frame.Duration
-            }).ToList();
+            mapTile.Animation = tile.Animation.Select(frame => ConvertAnimationFrame(frame, tileset)).ToList();
         }
 
         // Convert collision objects
@@ -452,6 +450,37 @@ public static class TiledMapProcessor
         }
 
         return mapTile;
+    }
+
+    /// <summary>
+    /// Convert animation frame with proper texture coordinates
+    /// </summary>
+    private static MapAnimationFrame ConvertAnimationFrame(TiledAnimationFrame frame, TiledTilesetRef tileset)
+    {
+        var animationFrame = new MapAnimationFrame
+        {
+            TileId = frame.TileId,
+            Duration = frame.Duration,
+            SourceWidth = tileset.TileWidth,
+            SourceHeight = tileset.TileHeight
+        };
+
+        // Calculate source rectangle coordinates within the tileset image
+        // Frame TileId is relative to the tileset (0-based index within the tileset)
+        if (tileset.Columns > 0)
+        {
+            int col = frame.TileId % tileset.Columns;
+            int row = frame.TileId / tileset.Columns;
+            
+            // Account for margin and spacing
+            int margin = tileset.Margin;
+            int spacing = tileset.Spacing;
+            
+            animationFrame.SourceX = margin + col * (tileset.TileWidth + spacing);
+            animationFrame.SourceY = margin + row * (tileset.TileHeight + spacing);
+        }
+        
+        return animationFrame;
     }
 
     /// <summary>

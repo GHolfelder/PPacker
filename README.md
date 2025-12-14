@@ -7,7 +7,7 @@ A powerful command-line tool for packing PNG files into texture atlases for Mono
 - **Texture Atlas Packing**: Efficiently pack multiple PNG files into a single texture atlas
 - **Sprite Data Merging**: Merge JSON sprite definitions and automatically update coordinates
 - **Aseprite Support**: Native support for Aseprite JSON exports - automatically detects and parses frame data
-- **Tiled Map Support**: Process Tiled TMX map files and TSX tilesets with comprehensive layer and object support, including automatic object geometry detection
+- **Tiled Map Support**: Process Tiled TMX map files and TSX tilesets with comprehensive layer and object support, including automatic object geometry detection and **tile animations**
 - **Animation Support**: Create animation definitions from sprite sequences with pattern matching
 - **Flexible Input**: Support for individual sprites, existing sprite sheets, Aseprite exports, or Tiled maps
 - **Smart Packing**: Bin packing algorithm with optional rotation for optimal space usage
@@ -466,6 +466,33 @@ Perfect for troubleshooting when sprites don't appear in the final atlas!
 ppacker example --output ./examples
 ```
 
+## Enhanced Features (v1.0.10)
+
+### Enhanced Tilemap Animation Support
+Complete animation system for MonoGame integration with precise texture coordinates:
+
+- **Texture Coordinate Calculation**: Animation frames now include `sourceX`, `sourceY`, `sourceWidth`, `sourceHeight` for direct MonoGame rendering
+- **Automatic Layout Processing**: PPacker calculates exact pixel coordinates based on tileset margin and spacing settings
+- **MonoGame Ready**: No manual coordinate calculation needed - use output directly with `SpriteBatch.Draw()`
+- **Comprehensive Documentation**: Complete integration guide with code examples in [TILEMAP-ANIMATIONS.md](TILEMAP-ANIMATIONS.md)
+- **Enhanced Testing**: Thorough test coverage for animation parsing, conversion, and coordinate calculation
+
+Animation frames are enhanced from simple tile references to complete texture data:
+```json
+{
+  "animation": [
+    {
+      "tileId": 21,
+      "duration": 100,
+      "sourceX": 166,
+      "sourceY": 67,
+      "sourceWidth": 32,
+      "sourceHeight": 32
+    }
+  ]
+}
+```
+
 ## Enhanced Features (v1.0.9)
 
 ### Bug Fixes and Security Updates
@@ -526,7 +553,7 @@ PPacker now provides full integration with Tiled map files (TMX/TSX), enabling s
 - **Data Format Support**: CSV and Base64 encoding with GZIP/ZLIB compression for layer data
 - **Atlas Integration**: Automatically pack tileset images and generate sprite mappings for MonoGame
 - **Object Support**: Full support for all object types with automatic geometry detection (rectangles, ellipses, circles, points, polygons, polylines, text objects)
-- **Animation Support**: Tile animations converted to MonoGame-compatible format
+- **Animation Support**: Full tile animation support with texture coordinate calculation for MonoGame integration
 - **Property Preservation**: All custom properties from maps, layers, tilesets, and objects maintained
 - **MonoGame Output**: Generate JSON map data optimized for MonoGame tile rendering libraries
 
@@ -545,6 +572,8 @@ PPacker now provides full integration with Tiled map files (TMX/TSX), enabling s
   }
 }
 ```
+
+For detailed information about using animated tiles in MonoGame applications, see [TILEMAP-ANIMATIONS.md](TILEMAP-ANIMATIONS.md).
 
 ## Enhanced Features (v1.0.6)
 
