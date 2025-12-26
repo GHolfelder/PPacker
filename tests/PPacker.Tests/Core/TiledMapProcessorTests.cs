@@ -255,7 +255,7 @@ namespace PPacker.Tests.Core
             };
 
             // Act
-            var mapData = TiledMapProcessor.ConvertToMapData(map, imageToSpriteMap, "atlas.png");
+            var mapData = TiledMapProcessor.ConvertToMapData(map, imageToSpriteMap, "atlas.png", "test_map");
 
             // Assert
             Assert.NotNull(mapData);
@@ -316,7 +316,7 @@ namespace PPacker.Tests.Core
             // Act
             var map = await TiledMapProcessor.LoadMapAsync(testObjectTmxPath);
             var imageToSpriteMap = new Dictionary<string, string>();
-            var mapData = TiledMapProcessor.ConvertToMapData(map, imageToSpriteMap, "test.png");
+            var mapData = TiledMapProcessor.ConvertToMapData(map, imageToSpriteMap, "test.png", "object_test_map");
 
             // Assert
             Assert.Single(mapData.ObjectLayers);
@@ -423,7 +423,7 @@ namespace PPacker.Tests.Core
             var imageToSpriteMap = new Dictionary<string, string>();
 
             // Act
-            var mapData = TiledMapProcessor.ConvertToMapData(map, imageToSpriteMap, "atlas.png");
+            var mapData = TiledMapProcessor.ConvertToMapData(map, imageToSpriteMap, "atlas.png", "animation_test_map");
 
             // Assert
             Assert.Single(mapData.Tilesets);

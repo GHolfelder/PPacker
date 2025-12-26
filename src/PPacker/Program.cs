@@ -371,6 +371,27 @@ ppacker --config ppacker-config.json
             return false;
         }
 
+        // Validate map naming conflicts for TMX inputs
+        if (hasTmxFiles)
+        {
+            var tmxInputs = config.Inputs.Where(input => !string.IsNullOrEmpty(input.TmxPath));
+            var usedMapNames = new HashSet<string>();
+            
+            foreach (var input in tmxInputs)
+            {
+                var mapName = !string.IsNullOrEmpty(input.Prefix) 
+                    ? $"{input.Prefix.TrimEnd('_')}map"
+                    : "map";
+                
+                if (usedMapNames.Contains(mapName))
+                {
+                    Console.WriteLine($"Error: Duplicate map name '{mapName}' detected. Please ensure TMX inputs have unique prefixes.");
+                    return false;
+                }
+                usedMapNames.Add(mapName);
+            }
+        }
+
         return true;
     }
 
