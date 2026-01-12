@@ -1,0 +1,345 @@
+[
+  {
+    "name": "mapmap",
+    "width": 8,
+    "height": 6,
+    "tileWidth": 32,
+    "tileHeight": 32,
+    "orientation": "orthogonal",
+    "backgroundColor": null,
+    "tilesets": [
+      {
+        "name": "grass_tileset",
+        "firstGid": 1,
+        "tileWidth": 32,
+        "tileHeight": 32,
+        "tileCount": 9,
+        "columns": 3,
+        "margin": 0,
+        "spacing": 0,
+        "atlasSprite": "map_grass_tiles",
+        "tiles": [
+          {
+            "id": 0,
+            "type": null,
+            "atlasSprite": null,
+            "animation": null,
+            "collisionObjects": null,
+            "properties": {
+              "type": "grass",
+              "walkable": true
+            }
+          },
+          {
+            "id": 1,
+            "type": null,
+            "atlasSprite": null,
+            "animation": null,
+            "collisionObjects": null,
+            "properties": {
+              "type": "grass_flower",
+              "walkable": true
+            }
+          },
+          {
+            "id": 4,
+            "type": null,
+            "atlasSprite": null,
+            "animation": null,
+            "collisionObjects": null,
+            "properties": {
+              "type": "stone",
+              "walkable": false
+            }
+          },
+          {
+            "id": 8,
+            "type": null,
+            "atlasSprite": null,
+            "animation": [
+              {
+                "tileId": 8,
+                "duration": 500,
+                "sourceX": 64,
+                "sourceY": 64,
+                "sourceWidth": 32,
+                "sourceHeight": 32
+              },
+              {
+                "tileId": 7,
+                "duration": 500,
+                "sourceX": 32,
+                "sourceY": 64,
+                "sourceWidth": 32,
+                "sourceHeight": 32
+              },
+              {
+                "tileId": 6,
+                "duration": 500,
+                "sourceX": 0,
+                "sourceY": 64,
+                "sourceWidth": 32,
+                "sourceHeight": 32
+              }
+            ],
+            "collisionObjects": null,
+            "properties": {
+              "type": "water",
+              "walkable": false
+            }
+          }
+        ],
+        "properties": {
+          "description": "A simple grass tileset for testing"
+        }
+      }
+    ],
+    "tileLayers": [
+      {
+        "id": 1,
+        "name": "Ground",
+        "width": 8,
+        "height": 6,
+        "opacity": 1,
+        "visible": true,
+        "offsetX": 0,
+        "offsetY": 0,
+        "tiles": [
+          1,
+          1,
+          2,
+          1,
+          1,
+          1,
+          2,
+          1,
+          1,
+          2,
+          1,
+          1,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          5,
+          5,
+          1,
+          1,
+          2,
+          2,
+          1,
+          1,
+          5,
+          5,
+          1,
+          1,
+          1,
+          1,
+          1,
+          2,
+          1,
+          1,
+          2,
+          1,
+          1,
+          1,
+          2,
+          1,
+          1,
+          1,
+          1,
+          2,
+          1
+        ],
+        "properties": {
+          "layer_type": "background"
+        }
+      },
+      {
+        "id": 2,
+        "name": "Water",
+        "width": 8,
+        "height": 6,
+        "opacity": 1,
+        "visible": true,
+        "offsetX": 0,
+        "offsetY": 0,
+        "tiles": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          9,
+          9,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          9,
+          9,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "properties": {
+          "layer_type": "decoration"
+        }
+      }
+    ],
+    "objectLayers": [
+      {
+        "id": 3,
+        "name": "Objects",
+        "opacity": 1,
+        "visible": true,
+        "offsetX": 0,
+        "offsetY": 0,
+        "objects": [
+          {
+            "id": 1,
+            "name": "spawn_point",
+            "type": "PlayerSpawn",
+            "objectType": "rectangle",
+            "x": 32,
+            "y": 32,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "gid": 0,
+            "visible": true,
+            "polygon": null,
+            "polyline": null,
+            "text": null,
+            "properties": {
+              "team": "blue"
+            }
+          },
+          {
+            "id": 2,
+            "name": "treasure_chest",
+            "type": "Chest",
+            "objectType": "rectangle",
+            "x": 160,
+            "y": 96,
+            "width": 32,
+            "height": 32,
+            "rotation": 0,
+            "gid": 0,
+            "visible": true,
+            "polygon": null,
+            "polyline": null,
+            "text": null,
+            "properties": {
+              "contents": "gold_coins",
+              "locked": true
+            }
+          },
+          {
+            "id": 3,
+            "name": "collision_area",
+            "type": "CollisionBox",
+            "objectType": "rectangle",
+            "x": 128,
+            "y": 64,
+            "width": 64,
+            "height": 64,
+            "rotation": 0,
+            "gid": 0,
+            "visible": true,
+            "polygon": null,
+            "polyline": null,
+            "text": null,
+            "properties": {
+              "solid": true
+            }
+          },
+          {
+            "id": 4,
+            "name": "patrol_path",
+            "type": "Path",
+            "objectType": "polyline",
+            "x": 64,
+            "y": 128,
+            "width": 0,
+            "height": 0,
+            "rotation": 0,
+            "gid": 0,
+            "visible": true,
+            "polygon": null,
+            "polyline": [
+              {
+                "x": 0,
+                "y": 0
+              },
+              {
+                "x": 64,
+                "y": 0
+              },
+              {
+                "x": 64,
+                "y": 32
+              },
+              {
+                "x": 0,
+                "y": 32
+              },
+              {
+                "x": 0,
+                "y": 0
+              }
+            ],
+            "text": null,
+            "properties": {
+              "speed": 2.5
+            }
+          }
+        ],
+        "properties": {
+          "layer_type": "collision"
+        }
+      }
+    ],
+    "imageLayers": [],
+    "properties": {
+      "author": "PPacker Example",
+      "description": "Simple test map for Tiled integration"
+    },
+    "atlasFile": "atlas.png"
+  }
+]

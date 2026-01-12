@@ -73,6 +73,24 @@
 ```
 
 ## 🐛 Bug Fixes
+
+### TMX/TSX Property Transfer Fix
+- **Fixed Missing Tileset Properties**: Margin and spacing attributes from TSX files are now properly preserved in JSON output
+  - Tileset `margin` attribute correctly transferred from TSX to output JSON
+  - Tileset `spacing` attribute correctly transferred from TSX to output JSON
+  - Previously these values were always showing as 0 regardless of TSX file settings
+- **Complete Property Coverage**: All TMX/TSX properties are now comprehensively preserved:
+  - ✅ Map-level properties (root element custom properties)
+  - ✅ Tile layer properties (layer-specific metadata)
+  - ✅ Object layer properties (object group metadata)
+  - ✅ Individual object properties (with proper type conversion)
+  - ✅ Individual tile properties (static and animated tiles)
+  - ✅ Tileset properties (including margin/spacing attributes)
+- **Enhanced Test Coverage**: Added comprehensive tests to prevent regression of property transfer functionality
+
+### Impact
+This fix ensures that all custom metadata and layout information from Tiled map editors is accurately preserved when converting to MonoGame format, maintaining the complete fidelity of map data.
+
 - Fixed compilation issues in unit tests after API changes
 - Improved error messaging for TMX processing failures
 
