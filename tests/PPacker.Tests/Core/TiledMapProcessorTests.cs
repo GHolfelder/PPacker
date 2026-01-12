@@ -32,10 +32,10 @@ namespace PPacker.Tests.Core
 
         private void CreateTestFiles()
         {
-            // Create a simple TSX file
+            // Create a simple TSX file with margin and spacing
             var tsxContent = """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <tileset version="1.10" tiledversion="1.10.2" name="test_tileset" tilewidth="32" tileheight="32" tilecount="4" columns="2">
+                <tileset version="1.10" tiledversion="1.10.2" name="test_tileset" tilewidth="32" tileheight="32" spacing="2" margin="1" tilecount="4" columns="2">
                  <properties>
                   <property name="description" value="Test tileset"/>
                  </properties>
@@ -457,6 +457,81 @@ namespace PPacker.Tests.Core
             Assert.Equal(150, frame3.Duration);
             Assert.Equal(1, frame3.SourceX); // margin + 0 * (tileWidth + spacing) = 1 + 0 * 33 = 1
             Assert.Equal(34, frame3.SourceY); // margin + 1 * (tileHeight + spacing) = 1 + 1 * 33 = 34
+        }
+
+        [Fact]
+        public async Task LoadTilesetAsync_ShouldPreserveMarginAndSpacing()
+        {
+            // Act
+            var tileset = await TiledMapProcessor.LoadTilesetAsync(_testTsxPath);
+
+            // Assert
+            Assert.Equal("test_tileset", tileset.Name);
+            Assert.Equal(32, tileset.TileWidth);
+            Assert.Equal(32, tileset.TileHeight);
+            Assert.Equal(4, tileset.TileCount);
+            Assert.Equal(2, tileset.Columns);
+            Assert.Equal(1, tileset.Margin); // Should load margin from TSX
+            Assert.Equal(2, tileset.Spacing); // Should load spacing from TSX
+            Assert.NotNull(tileset.Properties);
+            Assert.Equal("Test tileset", tileset.Properties.Properties.FirstOrDefault(p => p.Name == "description")?.Value);
+        }
+
+        [Fact]
+        public void ConvertToMapData_ShouldPreserveMarginAndSpacingProperties()
+        {
+            // Arrange
+            var tiledMap = new TiledMap
+            {
+                Width = 2,
+                Height = 2,
+                TileWidth = 32,
+                TileHeight = 32,
+                Orientation = "orthogonal",
+                Tilesets = new List<TiledTilesetRef>
+                {
+                    new()
+                    {
+                        Name = "test_tileset",
+                        FirstGid = 1,
+                        TileWidth = 32,
+                        TileHeight = 32,
+                        TileCount = 4,
+                        Columns = 2,
+                        Margin = 5,
+                        Spacing = 3,
+                        Properties = new TiledProperties
+                        {
+                            Properties = new List<TiledProperty>
+                            {
+                                new() { Name = "tileset_prop", Value = "test_value" }
+                            }
+                        }
+                    }
+                },
+                Layers = new List<TiledLayer>(),
+                ObjectGroups = new List<TiledObjectGroup>(),
+                ImageLayers = new List<TiledImageLayer>()
+            };
+
+            var imageToSpriteMap = new Dictionary<string, string>();
+
+            // Act
+            var mapData = TiledMapProcessor.ConvertToMapData(tiledMap, imageToSpriteMap, "test-atlas.png", "test-map");
+
+            // Assert
+            Assert.Single(mapData.Tilesets);
+            var tileset = mapData.Tilesets[0];
+            Assert.Equal("test_tileset", tileset.Name);
+            Assert.Equal(1, tileset.FirstGid);
+            Assert.Equal(32, tileset.TileWidth);
+            Assert.Equal(32, tileset.TileHeight);
+            Assert.Equal(4, tileset.TileCount);
+            Assert.Equal(2, tileset.Columns);
+            Assert.Equal(5, tileset.Margin); // Should preserve margin
+            Assert.Equal(3, tileset.Spacing); // Should preserve spacing
+            Assert.NotNull(tileset.Properties);
+            Assert.Equal("test_value", tileset.Properties["tileset_prop"]);
         }
 
         [Fact]

@@ -392,6 +392,8 @@ public static class TiledMapProcessor
             TileHeight = tileset.TileHeight,
             TileCount = tileset.TileCount,
             Columns = tileset.Columns,
+            Margin = tileset.Margin,
+            Spacing = tileset.Spacing,
             Properties = ParseProperties(tileset.Properties)
         };
 

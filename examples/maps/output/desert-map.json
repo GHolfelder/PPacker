@@ -15,8 +15,8 @@
         "tileHeight": 32,
         "tileCount": 48,
         "columns": 8,
-        "margin": 0,
-        "spacing": 0,
+        "margin": 1,
+        "spacing": 1,
         "atlasSprite": "desert_tmw_desert_spacing",
         "tiles": [
           {
@@ -956,8 +956,8 @@
         "tileHeight": 32,
         "tileCount": 48,
         "columns": 8,
-        "margin": 0,
-        "spacing": 0,
+        "margin": 1,
+        "spacing": 1,
         "atlasSprite": "oasis_subfolder_tiles",
         "tiles": [],
         "properties": {}

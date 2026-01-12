@@ -1,0 +1,33 @@
+{
+  "width": 512,
+  "height": 512,
+  "sprites": [
+    {
+      "name": "map_grass_tiles",
+      "x": 2,
+      "y": 2,
+      "width": 267,
+      "height": 402,
+      "rotated": false,
+      "sourceWidth": 512,
+      "sourceHeight": 512,
+      "trimX": 2,
+      "trimY": 2
+    }
+  ],
+  "metadata": {
+    "version": "1.0.0",
+    "generated": "2026-01-12T01:26:38.6763581Z",
+    "sources": [
+      "simple_map.tmx"
+    ],
+    "settings": {
+      "maxWidth": 512,
+      "maxHeight": 512,
+      "padding": 2,
+      "allowRotation": false,
+      "trimSprites": true,
+      "powerOfTwo": true
+    }
+  }
+}
