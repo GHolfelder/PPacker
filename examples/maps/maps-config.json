@@ -3,6 +3,10 @@
     {
       "tmxPath": "sample-map.tmx",
       "prefix": "desert_"
+    },
+    {
+      "tmxPath": "subfolder-test.tmx",
+      "prefix": "oasis_"
     }
   ],
   "output": {

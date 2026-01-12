@@ -18,6 +18,7 @@ public class AtlasPacker
     private readonly Dictionary<string, int> _frameDurations = new(StringComparer.Ordinal);
     // Loaded TMX maps for processing
     private readonly List<TiledMap> _loadedMaps = new();
+    private readonly List<(TiledMap Map, InputConfig Input)> _loadedMapsWithInputs = new();
 
     public AtlasPacker(PackerConfig config, bool verbose = false)
     {
@@ -618,6 +619,7 @@ public class AtlasPacker
                 // Load the TMX map
                 var map = await TiledMapProcessor.LoadMapAsync(input.TmxPath!, _verbose);
                 _loadedMaps.Add(map);
+                _loadedMapsWithInputs.Add((map, input));
 
                 // Extract image paths from the map
                 var mapDirectory = Path.GetDirectoryName(input.TmxPath!) ?? string.Empty;
@@ -718,24 +720,40 @@ public class AtlasPacker
         // Process each map
         var allMapData = new List<MapData>();
         
-        foreach (var map in _loadedMaps)
+        var mapDataDict = new Dictionary<string, MapData>();
+        var usedMapNames = new HashSet<string>();
+        
+        foreach (var (map, input) in _loadedMapsWithInputs)
         {
+            // Generate map name from prefix
+            var mapName = !string.IsNullOrEmpty(input.Prefix) 
+                ? $"{input.Prefix.TrimEnd('_')}map"
+                : "map";
+            
+            // Validate for duplicates
+            if (usedMapNames.Contains(mapName))
+            {
+                throw new InvalidOperationException($"Duplicate map name '{mapName}' detected. Please ensure TMX inputs have unique prefixes.");
+            }
+            usedMapNames.Add(mapName);
+            
             if (_verbose)
             {
-                Console.WriteLine($"[VERBOSE] Converting map to MonoGame format");
+                Console.WriteLine($"[VERBOSE] Converting map to MonoGame format with name: {mapName}");
             }
 
             var mapData = TiledMapProcessor.ConvertToMapData(
                 map, 
                 imageToSpriteMap, 
-                Path.GetFileName(atlasImagePath), 
+                Path.GetFileName(atlasImagePath),
+                mapName,
                 _verbose);
             
-            allMapData.Add(mapData);
+            mapDataDict[mapName] = mapData;
         }
 
-        // Save map data
-        await SaveMapDataAsync(allMapData, mapOutputPath);
+        // Save map data as array of maps
+        await SaveMapDataAsync(mapDataDict.Values.ToList(), mapOutputPath);
     }
 
     /// <summary>
@@ -749,8 +767,8 @@ public class AtlasPacker
             Directory.CreateDirectory(directory);
         }
 
-        // If there's only one map, save it directly. If multiple, save as array.
-        object outputData = mapDataList.Count == 1 ? mapDataList[0] : mapDataList;
+        // Always save as array for consistency
+        object outputData = mapDataList;
 
         var json = JsonSerializer.Serialize(outputData, new JsonSerializerOptions
         {

@@ -555,8 +555,51 @@ PPacker now provides full integration with Tiled map files (TMX/TSX), enabling s
 - **Object Support**: Full support for all object types with automatic geometry detection (rectangles, ellipses, circles, points, polygons, polylines, text objects)
 - **Animation Support**: Full tile animation support with texture coordinate calculation for MonoGame integration
 - **Property Preservation**: All custom properties from maps, layers, tilesets, and objects maintained
+- **Prefix-based Map Naming**: Maps are automatically named based on input prefixes (e.g., `desert_` → `desertmap`, no prefix → `map`)
 - **MonoGame Output**: Generate JSON map data optimized for MonoGame tile rendering libraries
 
+#### Multiple TMX Maps Example
+```json
+{
+  "inputs": [
+    {
+      "tmxPath": "maps/desert-level.tmx",
+      "prefix": "desert_"
+    },
+    {
+      "tmxPath": "maps/forest-level.tmx",
+      "prefix": "forest_"
+    }
+  ],
+  "output": {
+    "imagePath": "output/atlas.png",
+    "dataPath": "output/atlas.json",
+    "mapPath": "output/maps.json"
+  }
+}
+```
+
+#### Generated Map Data Structure
+```json
+[
+  {
+    "name": "desertmap",
+    "width": 30,
+    "height": 20,
+    "tilesets": [...],
+    "tileLayers": [...]
+  },
+  {
+    "name": "forestmap", 
+    "width": 25,
+    "height": 15,
+    "tilesets": [...],
+    "tileLayers": [...]
+  }
+]
+```
+
+#### Single TMX Map Example
 ```json
 {
   "inputs": [
@@ -574,6 +617,18 @@ PPacker now provides full integration with Tiled map files (TMX/TSX), enabling s
 ```
 
 For detailed information about using animated tiles in MonoGame applications, see [TILEMAP-ANIMATIONS.md](TILEMAP-ANIMATIONS.md).
+
+## Enhanced Features (v1.0.11)
+
+### Prefix-based TMX Map Naming
+PPacker now automatically generates meaningful map names when processing multiple TMX files:
+- **Prefix-based Naming**: Maps are named as `{prefix}map` when a prefix is specified (e.g., `desert_` → `desertmap`)
+- **Fallback Naming**: Maps without prefixes are named `map` for consistency
+- **Conflict Prevention**: Automatic validation prevents duplicate map names during configuration validation
+- **Array Output**: All map data is consistently output as an array structure, even for single maps
+- **Clear Error Messages**: Helpful validation messages guide users when naming conflicts occur
+
+This enhancement improves organization when working with multiple map files and provides better integration with MonoGame loading code.
 
 ## Enhanced Features (v1.0.6)
 
@@ -628,7 +683,7 @@ A PNG file containing all packed sprites.
     }
   ],
   "metadata": {
-  "version": "1.0.9",
+  "version": "1.0.11",
     "generated": "2025-11-08T10:00:00Z",
     "sources": ["sprites/player.png"],
     "settings": { /* atlas configuration */ }

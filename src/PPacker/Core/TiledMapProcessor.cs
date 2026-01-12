@@ -323,16 +323,16 @@ public static class TiledMapProcessor
     /// <summary>
     /// Convert Tiled map to MonoGame map data
     /// </summary>
-    public static MapData ConvertToMapData(TiledMap map, Dictionary<string, string> imageToSpriteMap, string atlasFile, bool verbose = false)
+    public static MapData ConvertToMapData(TiledMap map, Dictionary<string, string> imageToSpriteMap, string atlasFile, string mapName, bool verbose = false)
     {
         if (verbose)
         {
-            Console.WriteLine($"[VERBOSE] Converting Tiled map to MonoGame format");
+            Console.WriteLine($"[VERBOSE] Converting Tiled map to MonoGame format with name: {mapName}");
         }
 
         var mapData = new MapData
         {
-            Name = Path.GetFileNameWithoutExtension(atlasFile), // Use atlas name as map name
+            Name = mapName,
             Width = map.Width,
             Height = map.Height,
             TileWidth = map.TileWidth,

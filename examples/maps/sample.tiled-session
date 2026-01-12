@@ -3,36 +3,65 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "sample-map.tmx",
+    "activeFile": "subfolder-test.tmx",
     "expandedProjectPaths": [
+        "output",
         "tilesets",
-        ".",
-        "output"
+        "."
     ],
     "fileStates": {
-        "sample-map.tmx": {
-            "scale": 1.0192708333333333,
+        "object-types-test.tmx": {
+            "expandedObjectLayers": [
+                1
+            ],
+            "scale": 2.4046875,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 675.4828819621871,
-                "y": 435.60551865099643
+                "x": 119.9740090968161,
+                "y": 160.10396361273555
+            }
+        },
+        "sample-map.tmx": {
+            "expandedObjectLayers": [
+                2
+            ],
+            "scale": 1.0192708333333333,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 819.703628002044,
+                "y": 527.8283086356669
             }
         },
         "sample-set.tsx": {
             "scaleInDock": 1.5,
             "scaleInEditor": 4
+        },
+        "subfolder-test.tmx": {
+            "scale": 2.4046875,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 159.89603638726445,
+                "y": 128.08317089018843
+            }
+        },
+        "tilesets/subfolder-set.tsx": {
+            "scaleInDock": 1
         }
     },
     "last.imagePath": "C:/MonoGame/MonoGameLibrary/samples",
     "map.lastUsedFormat": "tmx",
     "openFiles": [
+        "sample-set.tsx",
         "sample-map.tmx",
-        "sample-set.tsx"
+        "object-types-test.tmx",
+        "subfolder-test.tmx"
     ],
     "project": "sample.tiled-project",
     "recentFiles": [
         "sample-set.tsx",
-        "sample-map.tmx"
+        "sample-map.tmx",
+        "object-types-test.tmx",
+        "subfolder-test.tmx"
     ],
     "tileset.lastUsedFormat": "tsx",
     "tileset.margin": 1,
