@@ -392,6 +392,61 @@ ppacker --config ppacker-config.json
             }
         }
 
+        // Validate fixed positions
+        var fixedPositions = new List<(int x, int y, int width, int height, string name)>();
+        
+        foreach (var input in config.Inputs)
+        {
+            if (input.FixedPosition != null)
+            {
+                // Skip TMX inputs for fixed position validation
+                if (!string.IsNullOrEmpty(input.TmxPath))
+                {
+                    Console.WriteLine("Error: Fixed positions are not supported for TMX inputs");
+                    return false;
+                }
+
+                // Check if fixed position is within atlas bounds
+                if (input.FixedPosition.X < 0 || input.FixedPosition.Y < 0)
+                {
+                    Console.WriteLine($"Error: Fixed position for '{input.ImagePath}' cannot have negative coordinates");
+                    return false;
+                }
+
+                // We can't validate exact sprite dimensions without loading the image,
+                // but we can do basic bounds checking
+                if (input.FixedPosition.X >= config.Atlas.MaxWidth || input.FixedPosition.Y >= config.Atlas.MaxHeight)
+                {
+                    Console.WriteLine($"Error: Fixed position for '{input.ImagePath}' is outside atlas bounds ({config.Atlas.MaxWidth}x{config.Atlas.MaxHeight})");
+                    return false;
+                }
+
+                // Collect for overlap checking (we'll use placeholder dimensions for validation)
+                var spriteName = !string.IsNullOrEmpty(input.Prefix) 
+                    ? $"{input.Prefix}{Path.GetFileNameWithoutExtension(input.ImagePath)}"
+                    : Path.GetFileNameWithoutExtension(input.ImagePath);
+                    
+                fixedPositions.Add((input.FixedPosition.X, input.FixedPosition.Y, 64, 64, spriteName));
+            }
+        }
+
+        // Check for overlapping fixed positions (basic validation with placeholder dimensions)
+        for (int i = 0; i < fixedPositions.Count; i++)
+        {
+            for (int j = i + 1; j < fixedPositions.Count; j++)
+            {
+                var pos1 = fixedPositions[i];
+                var pos2 = fixedPositions[j];
+                
+                // Simple overlap check (conservative estimate)
+                if (pos1.x < pos2.x + pos2.width && pos1.x + pos1.width > pos2.x &&
+                    pos1.y < pos2.y + pos2.height && pos1.y + pos1.height > pos2.y)
+                {
+                    Console.WriteLine($"Warning: Fixed positions for '{pos1.name}' and '{pos2.name}' may overlap");
+                }
+            }
+        }
+
         return true;
     }
 

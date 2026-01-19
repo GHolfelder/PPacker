@@ -45,9 +45,15 @@ public class AtlasPacker
 
             Console.WriteLine($"Loaded {allSprites.Count} sprites");
 
-            // Create packing rectangles
-            var packingRects = allSprites.Select(s => new PackingRectangle(
-                s.Image.Width, s.Image.Height, s.Name)).ToList();
+            // Create packing rectangles with positioning metadata
+            var packingRects = allSprites.Select(s => {
+                var input = FindInputForSprite(s.Name);
+                return new PackingRectangle(s.Image.Width, s.Image.Height, s.Name)
+                {
+                    FixedPosition = input?.FixedPosition,
+                    Priority = input?.Priority ?? 0
+                };
+            }).ToList();
 
             // Pack the rectangles
             var packer = new BinPacker(
@@ -777,5 +783,40 @@ public class AtlasPacker
 
         await File.WriteAllTextAsync(outputPath, json);
         Console.WriteLine($"Map data saved: {outputPath} ({mapDataList.Count} map(s))");
+    }
+
+    /// <summary>
+    /// Find the input configuration that created a specific sprite
+    /// </summary>
+    private InputConfig? FindInputForSprite(string spriteName)
+    {
+        foreach (var input in _config.Inputs)
+        {
+            // Skip TMX inputs
+            if (!string.IsNullOrEmpty(input.TmxPath))
+                continue;
+
+            // Check if sprite name matches this input
+            if (!string.IsNullOrEmpty(input.Prefix))
+            {
+                // Sprite has a prefix, check if it matches
+                if (spriteName.StartsWith(input.Prefix, StringComparison.Ordinal))
+                {
+                    return input;
+                }
+            }
+            else
+            {
+                // No prefix, check if it matches the image filename
+                var imageBaseName = Path.GetFileNameWithoutExtension(input.ImagePath);
+                if (spriteName.Equals(imageBaseName, StringComparison.Ordinal) ||
+                    spriteName.StartsWith($"{imageBaseName}_", StringComparison.Ordinal))
+                {
+                    return input;
+                }
+            }
+        }
+
+        return null;
     }
 }

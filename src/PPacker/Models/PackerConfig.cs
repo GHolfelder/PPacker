@@ -60,6 +60,36 @@ public class InputConfig
     /// </summary>
     [JsonPropertyName("tmxPath")]
     public string? TmxPath { get; set; }
+
+    /// <summary>
+    /// Fixed position for this sprite in the atlas (optional)
+    /// </summary>
+    [JsonPropertyName("fixedPosition")]
+    public FixedPosition? FixedPosition { get; set; }
+
+    /// <summary>
+    /// Priority for packing order (higher values packed first)
+    /// </summary>
+    [JsonPropertyName("priority")]
+    public int Priority { get; set; } = 0;
+}
+
+/// <summary>
+/// Fixed position configuration for sprites
+/// </summary>
+public class FixedPosition
+{
+    /// <summary>
+    /// X coordinate in pixels
+    /// </summary>
+    [JsonPropertyName("x")]
+    public int X { get; set; }
+
+    /// <summary>
+    /// Y coordinate in pixels
+    /// </summary>
+    [JsonPropertyName("y")]
+    public int Y { get; set; }
 }
 
 /// <summary>
