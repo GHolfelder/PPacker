@@ -1,22 +1,23 @@
 # PPacker - MonoGame Texture Atlas Packer
 
 ## Project Overview
-PPacker is a command-line tool for packing PNG files into texture atlases for MonoGame projects. It combines multiple sprites into optimized atlases with JSON metadata and animation definitions, designed for integration into MonoGame build pipelines. Additionally supports Tiled TMX map files with comprehensive tile processing and prefix-based map naming.
+PPacker is a command-line tool for packing PNG files into texture atlases for MonoGame projects. It combines multiple sprites into optimized atlases with JSON metadata and animation definitions, designed for integration into MonoGame build pipelines. Features fixed sprite positioning for fonts and UI elements, comprehensive Tiled TMX map support, and priority-based packing algorithms.
 
 ## Architecture & Key Components
 
 ### Core Components
-- **`Core/BinPacker`**: Bottom-left bin packing algorithm with rotation support
+- **`Core/BinPacker`**: Two-phase bin packing algorithm with fixed positioning, rotation support, and priority-based ordering
 - **`Core/SpriteProcessor`**: Image loading, trimming, and atlas generation using ImageSharp
-- **`Core/AtlasPacker`**: Main coordinator that orchestrates the packing process
+- **`Core/AtlasPacker`**: Main coordinator that orchestrates the packing process with sprite-to-input mapping
 - **`Core/TiledMapProcessor`**: TMX/TSX file parsing and map conversion to MonoGame format
-- **`Models/`**: Configuration and data models for JSON serialization
+- **`Models/`**: Configuration and data models for JSON serialization, including fixed positioning metadata
 
 ### Data Flow
-1. JSON config → Load sprites (individual PNGs, sprite sheets, or TMX maps) → Pack into atlas → Generate metadata + animations + map data
+1. JSON config → Load sprites (individual PNGs, sprite sheets, or TMX maps) with positioning metadata → Two-phase pack (fixed first, then dynamic) → Generate metadata + animations + map data
 2. Supports mixing individual sprites, existing sprite sheets, and Tiled TMX maps with metadata
-3. Outputs atlas PNG, sprite data JSON, optional animation definitions JSON, and map data JSON
-4. TMX processing: Load TMX/TSX → Extract tileset images → Apply prefixes → Generate map names → Convert to MonoGame format
+3. Fixed positioning: Place critical sprites (fonts, UI) at exact coordinates while others pack dynamically around them
+4. Outputs atlas PNG, sprite data JSON, optional animation definitions JSON, and map data JSON
+5. TMX processing: Load TMX/TSX → Extract tileset images → Apply prefixes → Generate map names → Convert to MonoGame format
 
 ## Development Workflows
 
@@ -25,6 +26,9 @@ PPacker is a command-line tool for packing PNG files into texture atlases for Mo
 # Build and run with sample config
 dotnet build
 dotnet run -- --config examples/sample-config.json --verbose
+
+# Test with fixed positioning
+dotnet run -- --config examples/fixed-position-config.json --verbose
 
 # Test with TMX maps
 dotnet run -- --config examples/maps/maps-config.json --verbose
@@ -38,10 +42,13 @@ dotnet run -- example --output ./test-examples
 
 ### Creating New Features
 - **Adding packing algorithms**: Extend `BinPacker` class or create new implementations
+- **Fixed positioning**: Modify `BinPacker.TryPlaceFixedRectangle()` for new positioning logic
+- **Priority systems**: Update priority-based sorting in `BinPacker.Pack()` method  
 - **New sprite processors**: Add methods to `SpriteProcessor` for different image operations
 - **Animation patterns**: Extend `AnimationPattern` model and update `AtlasPacker.GenerateFrameNames()`
 - **TMX processing**: Extend `TiledMapProcessor` for new TMX features or map formats
 - **Map naming**: Modify prefix-based naming logic in `AtlasPacker.ProcessTmxMapsAsync()`
+- **Sprite mapping**: Extend `AtlasPacker.FindInputForSprite()` for new input types
 
 ### Debugging
 - Use `--verbose` flag to see detailed packing information
@@ -67,6 +74,7 @@ dotnet run -- example --output ./test-examples
 - Uses `System.Text.Json` with `PropertyNameCaseInsensitive = true`
 - Models use `[JsonPropertyName]` attributes for consistent naming
 - Configuration supports individual sprites, sprite sheets, and TMX map inputs
+- Fixed positioning: `fixedPosition` object with x,y coordinates and optional `priority`
 - TMX processing generates prefix-based map names (`{prefix}map` or `map` fallback)
 - Map data always serialized as array structure for consistency
 
@@ -125,6 +133,30 @@ if (usedMapNames.Contains(mapName)) {
 3. Update `AtlasPacker` to use new algorithm based on config option
 4. Add configuration properties to `AtlasConfig` model
 
+### Working with Fixed Positioning
+```csharp
+// Two-phase packing in BinPacker.Pack()
+var fixedRects = rectangles.Where(r => r.IsFixed).ToList();
+var dynamicRects = rectangles.Where(r => !r.IsFixed).ToList();
+
+// Place fixed sprites first
+foreach (var rect in fixedRects) {
+    if (!TryPlaceFixedRectangle(rect)) return null;
+}
+
+// Then pack dynamic sprites with priority sorting
+var sortedDynamicRects = dynamicRects
+    .OrderByDescending(r => r.Priority)
+    .ThenByDescending(r => r.Area);
+```
+
+### Adding Fixed Position Features
+1. Extend `InputConfig` with new positioning properties (x, y coordinates)
+2. Update `PackingRectangle` to include positioning metadata and validation
+3. Modify `BinPacker.TryPlaceFixedRectangle()` for new placement logic
+4. Enhance `AtlasPacker.FindInputForSprite()` for sprite-to-config mapping
+5. Add validation in `Program.ValidateConfig()` for position conflicts
+
 ### Extending Animation System
 ```csharp
 // Add new pattern types to AnimationPattern
@@ -159,6 +191,9 @@ public class AnimationPattern
 - **Duplicate map names**: Ensure TMX inputs have unique prefixes to avoid naming conflicts
 - **External tileset errors**: Check that TSX files exist and image paths within them are correct
 - **Map conversion issues**: Verify TMX layer data encoding/compression is supported (CSV, Base64+GZIP/ZLIB)
+- **Fixed position conflicts**: Check for overlapping fixed positions or coordinates outside atlas bounds
+- **Fixed position validation**: Ensure fixed sprites don't exceed atlas dimensions and don't overlap
+- **Sprite-to-input mapping**: Verify `FindInputForSprite()` correctly matches sprite names to input configurations
 
 When working on this project, focus on:
 1. Understanding the content pipeline architecture before making changes
@@ -167,3 +202,5 @@ When working on this project, focus on:
 4. Optimizing for both build-time performance and runtime efficiency
 5. Preserving TMX map data integrity and MonoGame format compatibility
 6. Ensuring prefix-based naming logic handles edge cases properly
+7. Testing fixed positioning with different sprite combinations and priority values
+8. Validating that fixed sprites don't interfere with dynamic packing efficiency

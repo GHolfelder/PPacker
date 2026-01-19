@@ -1,3 +1,5 @@
+using PPacker.Models;
+
 namespace PPacker.Core;
 
 /// <summary>
@@ -36,6 +38,21 @@ public class PackingRectangle
     /// </summary>
     public int OriginalWidth { get; set; }
     public int OriginalHeight { get; set; }
+    
+    /// <summary>
+    /// Fixed position for this sprite (if specified)
+    /// </summary>
+    public FixedPosition? FixedPosition { get; set; }
+    
+    /// <summary>
+    /// Priority for packing order (higher values packed first)
+    /// </summary>
+    public int Priority { get; set; } = 0;
+    
+    /// <summary>
+    /// Whether this sprite has a fixed position
+    /// </summary>
+    public bool IsFixed => FixedPosition != null;
 
     public PackingRectangle(int width, int height, string name)
     {
@@ -85,13 +102,28 @@ public class BinPacker
     {
         _packedRectangles.Clear();
 
-        // Sort rectangles by area (largest first) for better packing efficiency
-        var sortedRectangles = rectangles
-            .OrderByDescending(r => r.Area)
+        // PHASE 1: Place fixed-position sprites first
+        var fixedRects = rectangles.Where(r => r.IsFixed).ToList();
+        var dynamicRects = rectangles.Where(r => !r.IsFixed).ToList();
+
+        // Place fixed sprites at their specified positions
+        foreach (var rect in fixedRects)
+        {
+            if (!TryPlaceFixedRectangle(rect))
+            {
+                // Fixed placement failed
+                return null;
+            }
+        }
+
+        // PHASE 2: Pack remaining sprites using existing algorithm
+        var sortedDynamicRects = dynamicRects
+            .OrderByDescending(r => r.Priority)
+            .ThenByDescending(r => r.Area)
             .ThenByDescending(r => Math.Max(r.Width, r.Height))
             .ToList();
 
-        foreach (var rect in sortedRectangles)
+        foreach (var rect in sortedDynamicRects)
         {
             if (!TryPackRectangle(rect))
             {
@@ -143,6 +175,46 @@ public class BinPacker
         }
 
         return false;
+    }
+
+    private bool TryPlaceFixedRectangle(PackingRectangle rect)
+    {
+        var fixedPos = rect.FixedPosition!;
+
+        // Check if fixed position is within atlas bounds
+        if (fixedPos.X + rect.Width > _maxWidth || fixedPos.Y + rect.Height > _maxHeight)
+        {
+            return false;
+        }
+
+        // Check for collisions with already placed rectangles
+        if (!CanPlaceAt(fixedPos.X - _padding, fixedPos.Y - _padding, 
+                       rect.Width + _padding * 2, rect.Height + _padding * 2))
+        {
+            return false;
+        }
+
+        // Check if rotation should be applied for fixed sprites
+        if (_allowRotation && rect.Width != rect.Height)
+        {
+            // Try both orientations and pick the one that fits better
+            bool normalFits = fixedPos.X + rect.Width <= _maxWidth && fixedPos.Y + rect.Height <= _maxHeight;
+            bool rotatedFits = fixedPos.X + rect.Height <= _maxWidth && fixedPos.Y + rect.Width <= _maxHeight;
+
+            if (rotatedFits && (!normalFits || rect.Height < rect.Width))
+            {
+                // Apply rotation
+                (rect.Width, rect.Height) = (rect.Height, rect.Width);
+                rect.Rotated = true;
+            }
+        }
+
+        // Place the rectangle at fixed position
+        rect.X = fixedPos.X;
+        rect.Y = fixedPos.Y;
+        _packedRectangles.Add(rect);
+
+        return true;
     }
 
     private (int X, int Y)? FindBestPosition(int width, int height)
